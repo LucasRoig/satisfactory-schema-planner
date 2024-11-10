@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PlusCircle } from "lucide-react";
 import { useProfileContext } from "../profile/profile-context";
 
 export function Graph() {
@@ -14,7 +15,10 @@ export function Graph() {
   } else if (profiles?.length === 0) {
     return (
       <div className="w-full h-full flex items-center justify-center">
-        <Button onClick={openCreateProfileModal}>Create a profile</Button>
+        <Button onClick={openCreateProfileModal}>
+          <PlusCircle className="h-5 w-5" />
+          Create a profile
+        </Button>
       </div>
     );
   }

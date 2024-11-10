@@ -10,6 +10,11 @@ export class ProfileRepository {
     return profiles;
   }
 
+  public async findById(id: number) {
+    const profile = await this.db.profiles.get(id);
+    return profile;
+  }
+
   public async insertProfile(profile: InsertProfile) {
     const id = await this.db.profiles.add(profile);
     return {
