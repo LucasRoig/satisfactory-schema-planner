@@ -8,25 +8,28 @@ import { Graph } from "./modules/graph/graph";
 import { ExportProfileButton } from "./modules/profile/export-profile-button";
 import { ProfileContextProvider } from "./modules/profile/profile-context";
 import { ProfileSwitcher } from "./modules/profile/profile-switcher";
+import { SettingsContextProvider } from "./modules/settings/settings-context";
 import { queryClient } from "./query-client";
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ReactQueryDevtools initialIsOpen={false} />
       <ProfileContextProvider>
-        <Toaster />
-        <div className={"flex flex-col h-screen"}>
-          <div className="border-b bg-background">
-            <div className="flex items-center h-16 px-4">
-              <ProfileSwitcher />
-              <div className="ml-4 text-2xl grow">Satisfactory Schema Planner</div>
-              <ExportProfileButton />
+        <SettingsContextProvider>
+          <Toaster />
+          <div className={"flex flex-col h-screen"}>
+            <div className="border-b bg-background">
+              <div className="flex items-center h-16 px-4">
+                <ProfileSwitcher />
+                <div className="ml-4 text-2xl grow">Satisfactory Schema Planner</div>
+                <ExportProfileButton />
+              </div>
             </div>
+            <main className="grow">
+              <Graph />
+            </main>
           </div>
-          <main className="grow">
-            <Graph />
-          </main>
-        </div>
+        </SettingsContextProvider>
       </ProfileContextProvider>
     </QueryClientProvider>
   );

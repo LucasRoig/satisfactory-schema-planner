@@ -3,9 +3,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { PlusCircle, Settings } from "lucide-react";
 import { useProfileContext } from "../profile/profile-context";
+import { useSettingsContext } from "../settings/settings-context";
 
 export function Graph() {
   const { selectedProfile, profiles, status: profileStatus, openCreateProfileModal } = useProfileContext();
+  const { openSettingsModal } = useSettingsContext();
 
   if (profileStatus === "pending") {
     return (
@@ -29,14 +31,14 @@ export function Graph() {
   }
   return (
     <div className="w-full h-full relative">
-      <SettingsButton className="absolute top-2 left-2" />
+      <SettingsButton className="absolute top-2 left-2" onClick={openSettingsModal} />
     </div>
   );
 }
 
-function SettingsButton({ className }: { className?: string }) {
+function SettingsButton({ className, onClick }: { className?: string; onClick?: () => void }) {
   return (
-    <Button variant="outline" className={cn("rounded-full", className)} size="icon">
+    <Button variant="outline" className={cn("rounded-full", className)} size="icon" onClick={onClick}>
       <Settings className="h-5 w-5" />
     </Button>
   );
