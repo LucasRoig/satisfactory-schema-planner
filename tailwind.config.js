@@ -1,4 +1,4 @@
-const { fontFamily } = require("tailwindcss/defaultTheme")
+const { fontFamily } = require("tailwindcss/defaultTheme");
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -12,7 +12,7 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ["GueistSans",...fontFamily.sans],
+        sans: ["GueistSans", ...fontFamily.sans],
         mono: ["GueistMono", ...fontFamily.mono],
       },
       colors: {
