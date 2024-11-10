@@ -1,0 +1,117 @@
+@font-face {
+  font-family: "GueistMono";
+  src: url("/font/geistmono/GeistMono-Thin.woff2") format("woff");
+  font-weight: 100;
+  font-style: normal;
+}
+@font-face {
+  font-family: "GueistMono";
+  src: url("/font/geistmono/GeistMono-UltraLight.woff2") format("woff");
+  font-weight: 200;
+  font-style: normal;
+}
+@font-face {
+  font-family: "GueistMono";
+  src: url("/font/geistmono/GeistMono-Light.woff2") format("woff");
+  font-weight: 300;
+  font-style: normal;
+}
+@font-face {
+  font-family: "GueistMono";
+  src: url("/font/geistmono/GeistMono-Regular.woff2") format("woff");
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: "GueistMono";
+  src: url("/font/geistmono/GeistMono-Medium.woff2") format("woff");
+  font-weight: 500;
+  font-style: normal;
+}
+@font-face {
+  font-family: "GueistMono";
+  src: url("/font/geistmono/GeistMono-SemiBold.woff2") format("woff");
+  font-weight: 600;
+  font-style: normal;
+}
+@font-face {
+  font-family: "GueistMono";
+  src: url("/font/geistmono/GeistMono-Bold.woff2") format("woff");
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: "GueistMono";
+  src: url("/font/geistmono/GeistMono-Black.woff2") format("woff");
+  font-weight: 800;
+  font-style: normal;
+}
+@font-face {
+  font-family: "GueistMono";
+  src: url("/font/geistmono/GeistMono-UltraBlack.woff2") format("woff");
+  font-weight: 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "GueistSans";
+  src: url("/font/geistsans/Geist-Thin.woff2") format("woff");
+  font-weight: 100;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "GueistSans";
+  src: url("/font/geistsans/Geist-UltraLight.woff2") format("woff");
+  font-weight: 200;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "GueistSans";
+  src: url("/font/geistsans/Geist-Light.woff2") format("woff");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "GueistSans";
+  src: url("/font/geistsans/Geist-Regular.woff2") format("woff");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "GueistSans";
+  src: url("/font/geistsans/Geist-Medium.woff2") format("woff");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "GueistSans";
+  src: url("/font/geistsans/Geist-SemiBold.woff2") format("woff");
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "GueistSans";
+  src: url("/font/geistsans/Geist-Bold.woff2") format("woff");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "GueistSans";
+  src: url("/font/geistsans/Geist-Black.woff2") format("woff");
+  font-weight: 800;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "GueistSans";
+  src: url("/font/geistsans/Geist-UltraBlack.woff2") format("woff");
+  font-weight: 900;
+  font-style: normal;
+}
