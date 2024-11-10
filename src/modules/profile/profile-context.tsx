@@ -6,8 +6,8 @@ import { CreateProfileModal } from "./create-profile-modal";
 import { type FetchAllProfilesResults, useQueryFetchAllProfiles } from "./queries/use-query-fetch-all-profiles";
 
 type ProfileContextType = {
-  profiles: FetchAllProfilesResults | undefined;
-  selectedProfile: FetchAllProfilesResults[number] | undefined;
+  profiles: FetchAllProfilesResults["profiles"] | undefined;
+  selectedProfile: FetchAllProfilesResults["profiles"][number] | undefined;
   setSelectedProfile: (profileId: number) => void;
   status: "error" | "success" | "pending";
   openCreateProfileModal: () => void;
@@ -20,29 +20,41 @@ export type ProfileContextProviderProps = {
 const ProfileContext = React.createContext<ProfileContextType | undefined>(undefined);
 
 export const ProfileContextProvider: React.FC<ProfileContextProviderProps> = (props) => {
-  const [selectedProfile, setSelectedProfile] = React.useState<FetchAllProfilesResults[number]>();
+  const [selectedProfile, setSelectedProfile] = React.useState<FetchAllProfilesResults["profiles"][number]>();
   const [isCreateProfileModalOpen, setIsCreateProfileModalOpen] = React.useState(false);
   const { data: profiles, status } = useQueryFetchAllProfiles({
     onSuccess: (results) => {
       if (selectedProfile === undefined) {
-        setSelectedProfile(results[0]);
+        const defaultProfileId = results.defaultProfileId;
+        let p = results.profiles[0];
+        if (defaultProfileId !== undefined) {
+          const defaultP = results.profiles.find((p) => p.id === defaultProfileId);
+          if (defaultP !== undefined) {
+            p = defaultP;
+          }
+        }
+        setSelectedProfile(p);
       }
     },
   });
 
   const createProfile = useMutation({
     mutationFn: (profile: InsertProfile) => ProfileUseCases.createProfile(profile),
-    onSuccess: () => {},
+    onSuccess: (data) => {
+      setSelectedProfile(data);
+      ProfileUseCases.setProfileInConfig(data.id);
+    },
   });
 
   const value: ProfileContextType = {
     status,
-    profiles,
+    profiles: profiles?.profiles,
     selectedProfile,
     openCreateProfileModal: () => setIsCreateProfileModalOpen(true),
     setSelectedProfile: (id: number) => {
-      const profile = profiles?.find((p) => p.id === id);
+      const profile = profiles?.profiles?.find((p) => p.id === id);
       if (profile) {
+        ProfileUseCases.setProfileInConfig(id);
         setSelectedProfile(profile);
       }
     },
@@ -54,11 +66,7 @@ export const ProfileContextProvider: React.FC<ProfileContextProviderProps> = (pr
         isOpen={isCreateProfileModalOpen}
         setIsOpen={setIsCreateProfileModalOpen}
         onSubmit={(args) => {
-          createProfile.mutate(args, {
-            onSuccess: (data) => {
-              setSelectedProfile(data);
-            },
-          });
+          createProfile.mutate(args);
         }}
       />
       {props.children}
