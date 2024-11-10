@@ -14,6 +14,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import React from "react";
+import { useSettingsContext } from "./settings-context";
 
 type Item = {
   id: number;
@@ -30,29 +31,10 @@ const columns = [
   },
 ] as const satisfies ColumnDef<Item, unknown>[];
 
-const data = [
-  { id: 1, name: "Test 1" },
-  { id: 2, name: "Test 2" },
-  { id: 3, name: "Test 3" },
-  { id: 4, name: "Test 4" },
-  { id: 5, name: "Test 5" },
-  { id: 6, name: "Test 6" },
-  { id: 7, name: "Test 7" },
-  { id: 8, name: "Test 8" },
-  { id: 9, name: "Test 9" },
-  { id: 10, name: "Test 10" },
-  { id: 11, name: "Test 11" },
-  { id: 12, name: "Test 12" },
-  { id: 13, name: "Test 13" },
-  { id: 14, name: "Test 14" },
-  { id: 15, name: "Test 15" },
-  { id: 16, name: "Test 16" },
-  { id: 17, name: "Test 17" },
-  { id: 18, name: "Test 18" },
-  { id: 19, name: "Test 19" },
-];
+const data: Item[] = [{ id: 1, name: "Test 1" }];
 
 export function ItemsTable() {
+  const { openItemDetails } = useSettingsContext();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -79,9 +61,10 @@ export function ItemsTable() {
 
   return (
     <div className="w-full flex flex-col overflow-auto max-h-full h-full">
-      <div className="flex items-center py-4">
+      <div className="flex flex-col py-4 gap-4">
+        <div className="text-xl">Items</div>
         <Input
-          placeholder="Filter emails..."
+          placeholder="Filter items..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)}
           className="max-w-sm"
@@ -105,7 +88,12 @@ export function ItemsTable() {
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                <TableRow
+                  className="cursor-pointer"
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                  onClick={() => openItemDetails(row.original.id)}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                   ))}
