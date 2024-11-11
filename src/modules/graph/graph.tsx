@@ -2,10 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { PlusCircle, Settings } from "lucide-react";
+import React from "react";
 import { useProfileContext } from "../profile/profile-context";
 import { useSettingsContext } from "../settings/settings-context";
+import { CreateSchemaModal } from "./create-schema-modal";
 
 export function Graph() {
+  const [isCreateSchemaModalOpen, setIsCreateSchemaModalOpen] = React.useState(false);
   const { selectedProfile, profiles, status: profileStatus, openCreateProfileModal } = useProfileContext();
   const { openSettingsModal } = useSettingsContext();
 
@@ -32,6 +35,13 @@ export function Graph() {
   return (
     <div className="w-full h-full relative">
       <SettingsButton className="absolute top-2 left-2" onClick={openSettingsModal} />
+      <div className="w-full h-full flex items-center justify-center">
+        <CreateSchemaModal isOpen={isCreateSchemaModalOpen} setIsOpen={setIsCreateSchemaModalOpen} />
+        <Button onClick={() => setIsCreateSchemaModalOpen(true)}>
+          <PlusCircle className="h-5 w-5" />
+          Create a schema
+        </Button>
+      </div>
     </div>
   );
 }
