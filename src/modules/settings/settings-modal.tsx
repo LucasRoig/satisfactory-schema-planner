@@ -1,6 +1,8 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { match } from "ts-pattern";
+import { Home } from "./home";
+import { ItemsCreate } from "./items-create";
 import { ItemsDetails } from "./items-details";
-import { ItemsTable } from "./items-table";
 import { useSettingsContext } from "./settings-context";
 
 export function SettingsModal(props: {
@@ -8,6 +10,14 @@ export function SettingsModal(props: {
   setIsOpen: (isOpen: boolean) => void;
 }) {
   const { screen } = useSettingsContext();
+
+  const component = match(screen)
+    .with({ screen: "HOME" }, () => <Home />)
+    .with({ screen: "ITEM_DETAILS" }, () => <ItemsDetails />)
+    .with({ screen: "CREATE_ITEM" }, () => <ItemsCreate />)
+    .with({ screen: "BUILDING_DETAILS" }, () => <div />)
+    .exhaustive();
+
   return (
     <Dialog open={props.isOpen} onOpenChange={props.setIsOpen}>
       <DialogContent
@@ -18,16 +28,7 @@ export function SettingsModal(props: {
           <DialogHeader>
             <DialogTitle>Configure this profile</DialogTitle>
           </DialogHeader>
-          <div className="flex flex-col overflow-auto max-h-full h-full grow">
-            {screen.screen === "HOME" ? (
-              <div className="flex items-center justify-between gap-4 max-h-full overflow-auto h-full">
-                <ItemsTable />
-                <ItemsTable />
-              </div>
-            ) : null}
-            {screen.screen === "ITEM_DETAILS" ? <ItemsDetails /> : null}
-            {screen.screen === "CREATE_ITEM" ? <div /> : null}
-          </div>
+          <div className="flex flex-col overflow-auto max-h-full h-full grow">{component}</div>
         </div>
       </DialogContent>
     </Dialog>
