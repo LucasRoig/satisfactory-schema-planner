@@ -3,7 +3,7 @@ import type { EntityTable } from "dexie";
 export type Item = {
   id: number;
   name: string;
-  icon: string;
+  icon: string | undefined;
   profileId: number;
 };
 

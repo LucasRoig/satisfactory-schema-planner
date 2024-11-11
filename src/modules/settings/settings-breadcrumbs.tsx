@@ -1,5 +1,3 @@
-import { match } from "ts-pattern";
-import { useSettingsContext } from "./settings-context";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,6 +6,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { match } from "ts-pattern";
+import { useSettingsContext } from "./settings-context";
 
 export function SettingsBreadcrumbs() {
   const { screen } = useSettingsContext();
@@ -23,9 +23,7 @@ export function SettingsBreadcrumbs() {
 
   return (
     <Breadcrumb>
-      <BreadcrumbList>
-        {component}
-      </BreadcrumbList>
+      <BreadcrumbList>{component}</BreadcrumbList>
     </Breadcrumb>
   );
 }

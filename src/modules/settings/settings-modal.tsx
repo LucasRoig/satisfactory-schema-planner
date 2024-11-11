@@ -18,6 +18,13 @@ export function SettingsModal(props: {
     .with({ screen: "BUILDING_DETAILS" }, () => <div />)
     .exhaustive();
 
+  const title = match(screen)
+    .with({ screen: "HOME" }, () => "Configure this profile")
+    .with({ screen: "ITEM_DETAILS" }, () => "Item details")
+    .with({ screen: "CREATE_ITEM" }, () => "Create an item")
+    .with({ screen: "BUILDING_DETAILS" }, () => "Building details")
+    .exhaustive();
+
   return (
     <Dialog open={props.isOpen} onOpenChange={props.setIsOpen}>
       <DialogContent
@@ -26,7 +33,7 @@ export function SettingsModal(props: {
       >
         <div className="w-full flex flex-col overflow-auto max-h-full h-full">
           <DialogHeader>
-            <DialogTitle>Configure this profile</DialogTitle>
+            <DialogTitle>{title}</DialogTitle>
           </DialogHeader>
           <div className="flex flex-col overflow-auto max-h-full h-full grow">{component}</div>
         </div>
