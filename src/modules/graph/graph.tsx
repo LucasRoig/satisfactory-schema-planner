@@ -1,3 +1,4 @@
+import { OrDivider } from "@/components/or-divider";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -6,9 +7,11 @@ import React from "react";
 import { useProfileContext } from "../profile/profile-context";
 import { useSettingsContext } from "../settings/settings-context";
 import { CreateSchemaModal } from "./create-schema-modal";
+import { useSchemaDrawerContext } from "./schema-drawer-context";
 import { SchemaTabs } from "./schema-tabs";
 
 export function Graph() {
+  const { openenedSchemaIds, focusedSchemaId } = useSchemaDrawerContext();
   const [isCreateSchemaModalOpen, setIsCreateSchemaModalOpen] = React.useState(false);
   const { selectedProfile, profiles, status: profileStatus, openCreateProfileModal } = useProfileContext();
   const { openSettingsModal } = useSettingsContext();
@@ -35,14 +38,25 @@ export function Graph() {
   }
   return (
     <div className="w-full h-full  flex flex-col">
-      <SchemaTabs />
+      {openenedSchemaIds.length > 0 ? <SchemaTabs /> : null}
       <div className="w-full h-full flex items-center justify-center grow relative">
         <SettingsButton className="absolute top-2 left-2" onClick={openSettingsModal} />
-        <CreateSchemaModal isOpen={isCreateSchemaModalOpen} setIsOpen={setIsCreateSchemaModalOpen} />
-        <Button onClick={() => setIsCreateSchemaModalOpen(true)}>
-          <PlusCircle className="h-5 w-5" />
-          Create a schema
-        </Button>
+        {focusedSchemaId === undefined ? (
+          <div className="flex flex-col">
+            <CreateSchemaModal isOpen={isCreateSchemaModalOpen} setIsOpen={setIsCreateSchemaModalOpen} />
+            <Button onClick={() => setIsCreateSchemaModalOpen(true)}>
+              <PlusCircle className="h-5 w-5" />
+              Create a schema
+            </Button>
+            <OrDivider />
+            <Button onClick={() => setIsCreateSchemaModalOpen(true)}>
+              <PlusCircle className="h-5 w-5" />
+              Create a schema
+            </Button>
+          </div>
+        ) : (
+          <div>{`schema id is ${focusedSchemaId}`}</div>
+        )}
       </div>
     </div>
   );

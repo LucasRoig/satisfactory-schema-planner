@@ -1,17 +1,31 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { PlusCircle, X } from "lucide-react";
+import React from "react";
+import { CreateSchemaModal } from "./create-schema-modal";
+import { useSchemaDrawerContext } from "./schema-drawer-context";
 
 export function SchemaTabs() {
+  const { openenedSchemaIds, focusedSchemaId, focusSchema, closeSchema } = useSchemaDrawerContext();
+  const [isCreateSchemaModalOpen, setIsCreateSchemaModalOpen] = React.useState(false);
   return (
     <div className="bg-background border-b px-4 w-full h-10 flex justify-start items-center overflow-x-auto">
-      <TabItem name="test" isActive />
-      <TabItem name="test" />
-      <TabItem name="test" />
-      <TabItem name="test" />
-      <TabItem name="test" />
-      <TabItem name="test" />
-      <Button variant="ghost" size="sm" className="ml-2 text-muted-foreground h-7 w-7 rounded-full">
+      <CreateSchemaModal isOpen={isCreateSchemaModalOpen} setIsOpen={setIsCreateSchemaModalOpen} />
+      {openenedSchemaIds.map((id) => (
+        <TabItem
+          key={id}
+          name={id.toString()}
+          isActive={id === focusedSchemaId}
+          onClick={() => focusSchema(id)}
+          onClose={() => closeSchema(id)}
+        />
+      ))}
+      <Button
+        variant="ghost"
+        size="sm"
+        className="ml-2 text-muted-foreground h-7 w-7 rounded-full"
+        onClick={() => setIsCreateSchemaModalOpen(true)}
+      >
         <PlusCircle className="h-4 w-4" />
         <span className="sr-only">Add new schema</span>
       </Button>
@@ -19,7 +33,7 @@ export function SchemaTabs() {
   );
 }
 
-function TabItem(props: { name: string; isActive?: boolean }) {
+function TabItem(props: { name: string; isActive?: boolean; onClick?: () => void; onClose?: () => void }) {
   return (
     <button
       type="button"
@@ -29,10 +43,14 @@ function TabItem(props: { name: string; isActive?: boolean }) {
         props.isActive && "text-foreground shadow-sm bg-muted",
         !props.isActive && "hover:bg-muted/50",
       )}
+      onClick={props.onClick}
     >
       <span className="mr-4">{props.name}</span>
       <Button
-        onClick={(e) => e.stopPropagation()}
+        onClick={(e) => {
+          e.stopPropagation();
+          props.onClose?.();
+        }}
         variant="ghost"
         size="sm"
         className="p-0 h-5 w-5 absolute right-2 opacity-0 group-hover:opacity-100 transition-opacity rounded-full"

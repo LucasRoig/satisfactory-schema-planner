@@ -18,6 +18,7 @@ import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useProfileContext } from "../profile/profile-context";
+import { useSchemaDrawerContext } from "./schema-drawer-context";
 
 const schemaFormSchema = z.object({
   name: z.string().min(1),
@@ -31,6 +32,7 @@ export function CreateSchemaModal(props: {
   setIsOpen: (isOpen: boolean) => void;
   onSubmit?: (args: { name: string }) => void;
 }) {
+  const { openSchema } = useSchemaDrawerContext();
   const { selectedProfile } = useProfileContext();
   const form = useForm<SchemaFormValues>({
     resolver: zodResolver(schemaFormSchema),
@@ -52,9 +54,10 @@ export function CreateSchemaModal(props: {
         path: schema.path,
       });
     },
-    onSuccess: (_data) => {
+    onSuccess: (data) => {
       props.setIsOpen(false);
       form.reset();
+      openSchema(data.id);
     },
   });
 
