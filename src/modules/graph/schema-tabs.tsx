@@ -1,20 +1,24 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { PlusCircle, X } from "lucide-react";
+import { FolderOpen, PlusCircle, X } from "lucide-react";
 import React from "react";
+import { useProfileContext } from "../profile/profile-context";
 import { CreateSchemaModal } from "./create-schema-modal";
 import { useSchemaDrawerContext } from "./schema-drawer-context";
 
 export function SchemaTabs() {
-  const { openenedSchemaIds, focusedSchemaId, focusSchema, closeSchema } = useSchemaDrawerContext();
+  const { openenedSchemaIds, focusedSchemaId, focusSchema, closeSchema, setIsOpenSchemaDialogOpen } =
+    useSchemaDrawerContext();
   const [isCreateSchemaModalOpen, setIsCreateSchemaModalOpen] = React.useState(false);
+  const { schemas } = useProfileContext();
+
   return (
     <div className="bg-background border-b px-4 w-full h-10 flex justify-start items-center overflow-x-auto">
       <CreateSchemaModal isOpen={isCreateSchemaModalOpen} setIsOpen={setIsCreateSchemaModalOpen} />
       {openenedSchemaIds.map((id) => (
         <TabItem
           key={id}
-          name={id.toString()}
+          name={schemas.get(id)?.name ?? "??"}
           isActive={id === focusedSchemaId}
           onClick={() => focusSchema(id)}
           onClose={() => closeSchema(id)}
@@ -28,6 +32,15 @@ export function SchemaTabs() {
       >
         <PlusCircle className="h-4 w-4" />
         <span className="sr-only">Add new schema</span>
+      </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        className="ml-2 text-muted-foreground h-7 w-7 rounded-full"
+        onClick={() => setIsOpenSchemaDialogOpen(true)}
+      >
+        <FolderOpen className="h-4 w-4" />
+        <span className="sr-only">Open schema</span>
       </Button>
     </div>
   );

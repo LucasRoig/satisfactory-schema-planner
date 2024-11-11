@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import React, { useContext } from "react";
 import { CreateProfileModal } from "./create-profile-modal";
 import { type FetchAllProfilesResults, useQueryFetchAllProfiles } from "./queries/use-query-fetch-all-profiles";
+import { type FetchSchemasResults, useQueryFetchAllSchemas } from "./queries/use-query-fetch-all-schemas";
 
 type ProfileContextType = {
   profiles: FetchAllProfilesResults["profiles"] | undefined;
@@ -11,6 +12,7 @@ type ProfileContextType = {
   setSelectedProfile: (profileId: number) => void;
   status: "error" | "success" | "pending";
   openCreateProfileModal: () => void;
+  schemas: Map<number, FetchSchemasResults[number]>;
 };
 
 export type ProfileContextProviderProps = {
@@ -22,6 +24,9 @@ const ProfileContext = React.createContext<ProfileContextType | undefined>(undef
 export const ProfileContextProvider: React.FC<ProfileContextProviderProps> = (props) => {
   const [selectedProfile, setSelectedProfile] = React.useState<FetchAllProfilesResults["profiles"][number]>();
   const [isCreateProfileModalOpen, setIsCreateProfileModalOpen] = React.useState(false);
+
+  const { data: schemas } = useQueryFetchAllSchemas(selectedProfile?.id);
+
   const { data: profiles, status } = useQueryFetchAllProfiles({
     onSuccess: (results) => {
       if (selectedProfile === undefined) {
@@ -58,6 +63,7 @@ export const ProfileContextProvider: React.FC<ProfileContextProviderProps> = (pr
         setSelectedProfile(profile);
       }
     },
+    schemas: new Map(schemas.map((s) => [s.id, s])),
   };
 
   return (

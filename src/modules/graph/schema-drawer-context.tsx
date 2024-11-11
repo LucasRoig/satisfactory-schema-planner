@@ -1,4 +1,5 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
+import { useProfileContext } from "../profile/profile-context";
 
 type SchemaDrawerContextType = {
   openenedSchemaIds: number[];
@@ -6,6 +7,8 @@ type SchemaDrawerContextType = {
   focusSchema: (schemaId: number) => void;
   openSchema: (schemaId: number) => void;
   closeSchema: (schemaId: number) => void;
+  isOpenSchemaDialogOpen: boolean;
+  setIsOpenSchemaDialogOpen: (isOpen: boolean) => void;
 };
 
 export type SchemaDrawerContextProviderProps = {
@@ -15,8 +18,17 @@ export type SchemaDrawerContextProviderProps = {
 const SchemaDrawerContext = React.createContext<SchemaDrawerContextType | undefined>(undefined);
 
 export const SchemaDrawerContextProvider: React.FC<SchemaDrawerContextProviderProps> = (props) => {
+  const { selectedProfile } = useProfileContext();
   const [openenedSchemaIds, setOpenenedSchemaIds] = React.useState<number[]>([]);
   const [focusedSchemaId, setFocusedSchemaId] = React.useState<number>();
+  const [isOpenSchemaDialogOpen, setIsOpenSchemaDialogOpen] = React.useState(false);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  useEffect(() => {
+    setOpenenedSchemaIds([]);
+    setFocusedSchemaId(undefined);
+  }, [selectedProfile]);
+
   const value: SchemaDrawerContextType = {
     openenedSchemaIds,
     focusedSchemaId,
@@ -47,6 +59,8 @@ export const SchemaDrawerContextProvider: React.FC<SchemaDrawerContextProviderPr
         setFocusedSchemaId(nextFocus);
       }
     },
+    isOpenSchemaDialogOpen,
+    setIsOpenSchemaDialogOpen,
   };
   return <SchemaDrawerContext.Provider value={value}>{props.children}</SchemaDrawerContext.Provider>;
 };
