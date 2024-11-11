@@ -13,13 +13,17 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { PlusCircle } from "lucide-react";
 import React from "react";
+import { useItemsForProfile } from "./queries/useItemsForProfile";
 import { useSettingsContext } from "./settings-context";
 
 type Item = {
   id: number;
   name: string;
+  icon: string;
 };
+
 const columns = [
   {
     accessorKey: "id",
@@ -31,17 +35,16 @@ const columns = [
   },
 ] as const satisfies ColumnDef<Item, unknown>[];
 
-const data: Item[] = [{ id: 1, name: "Test 1" }];
-
 export function ItemsTable() {
-  const { openItemDetails } = useSettingsContext();
+  const { data: items } = useItemsForProfile();
+  const { openItemDetails, openCreateItem } = useSettingsContext();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
-    data,
+    data: items,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -63,12 +66,18 @@ export function ItemsTable() {
     <div className="w-full flex flex-col overflow-auto max-h-full h-full">
       <div className="flex flex-col py-4 gap-4">
         <div className="text-xl">Items</div>
-        <Input
-          placeholder="Filter items..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-          onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)}
-          className="max-w-sm"
-        />
+        <div className="flex items-center gap-4">
+          <Input
+            placeholder="Filter items..."
+            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+            onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)}
+            className="max-w-sm"
+          />
+          <Button variant="outline" className="ml-auto" onClick={openCreateItem}>
+            <PlusCircle className="h-5 w-5" />
+            Create Item
+          </Button>
+        </div>
       </div>
       <div className="rounded-md border overflow-auto grow max-h-full flex flex-col">
         <Table className="max-h-full overflow-auto bg-background">

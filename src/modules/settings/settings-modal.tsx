@@ -26,6 +26,7 @@ export function SettingsModal(props: {
               </div>
             ) : null}
             {screen.screen === "ITEM_DETAILS" ? <ItemsDetails /> : null}
+            {screen.screen === "CREATE_ITEM" ? <div /> : null}
           </div>
         </div>
       </DialogContent>
