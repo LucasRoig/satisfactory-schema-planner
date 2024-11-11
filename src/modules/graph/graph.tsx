@@ -6,6 +6,7 @@ import React from "react";
 import { useProfileContext } from "../profile/profile-context";
 import { useSettingsContext } from "../settings/settings-context";
 import { CreateSchemaModal } from "./create-schema-modal";
+import { SchemaTabs } from "./schema-tabs";
 
 export function Graph() {
   const [isCreateSchemaModalOpen, setIsCreateSchemaModalOpen] = React.useState(false);
@@ -33,9 +34,10 @@ export function Graph() {
     return <div className="w-full h-full flex items-center justify-center">Please select a profile</div>;
   }
   return (
-    <div className="w-full h-full relative">
-      <SettingsButton className="absolute top-2 left-2" onClick={openSettingsModal} />
-      <div className="w-full h-full flex items-center justify-center">
+    <div className="w-full h-full  flex flex-col">
+      <SchemaTabs />
+      <div className="w-full h-full flex items-center justify-center grow relative">
+        <SettingsButton className="absolute top-2 left-2" onClick={openSettingsModal} />
         <CreateSchemaModal isOpen={isCreateSchemaModalOpen} setIsOpen={setIsCreateSchemaModalOpen} />
         <Button onClick={() => setIsCreateSchemaModalOpen(true)}>
           <PlusCircle className="h-5 w-5" />
