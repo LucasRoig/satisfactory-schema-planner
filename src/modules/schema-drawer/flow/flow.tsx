@@ -31,7 +31,7 @@ export function Flow() {
 function _Flow() {
   const [nodes, setNodes] = useState<Node[]>(initialNodes);
   const [edges, setEdges] = useState<Edge[]>(initialEdges);
-  const { screenToFlowPosition } = useReactFlow();
+  const { screenToFlowPosition, addNodes, updateNodeData: _updateNodeData } = useReactFlow();
 
   const onNodesChange: OnNodesChange = useCallback((changes) => setNodes((nds) => applyNodeChanges(changes, nds)), []);
   const onEdgesChange: OnEdgesChange = useCallback((changes) => setEdges((eds) => applyEdgeChanges(changes, eds)), []);
@@ -39,11 +39,9 @@ function _Flow() {
   const handleDoubleClick: MouseEventHandler = useCallback(
     (e) => {
       const { x, y } = screenToFlowPosition({ x: e.clientX, y: e.clientY });
-      onNodesChange([{ type: "add", item: { id: uuid(), position: { x, y }, data: { label: "New Node" } } }]);
-      e.stopPropagation();
-      e.preventDefault();
+      addNodes([{ id: uuid(), position: { x, y }, data: { label: "New Node" } }]);
     },
-    [screenToFlowPosition, onNodesChange],
+    [screenToFlowPosition, addNodes],
   );
 
   return (
