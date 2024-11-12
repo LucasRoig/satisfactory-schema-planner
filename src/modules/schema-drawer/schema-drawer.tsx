@@ -7,11 +7,12 @@ import React from "react";
 import { useProfileContext } from "../profile/profile-context";
 import { useSettingsContext } from "../settings/settings-context";
 import { CreateSchemaModal } from "./create-schema-modal";
+import { Flow } from "./flow/flow";
 import { OpenSchemaCommandDialog } from "./open-schema-command-dialog";
 import { useSchemaDrawerContext } from "./schema-drawer-context";
 import { SchemaTabs } from "./schema-tabs";
 
-export function Graph() {
+export function SchemaDrawer() {
   const { openenedSchemaIds, focusedSchemaId, setIsOpenSchemaDialogOpen } = useSchemaDrawerContext();
   const [isCreateSchemaModalOpen, setIsCreateSchemaModalOpen] = React.useState(false);
   const { selectedProfile, profiles, status: profileStatus, openCreateProfileModal, schemas } = useProfileContext();
@@ -42,7 +43,7 @@ export function Graph() {
       <OpenSchemaCommandDialog />
       {openenedSchemaIds.length > 0 ? <SchemaTabs /> : null}
       <div className="w-full h-full flex items-center justify-center grow relative">
-        <SettingsButton className="absolute top-2 left-2" onClick={openSettingsModal} />
+        <SettingsButton className="absolute top-2 left-2 z-10" onClick={openSettingsModal} />
         {focusedSchemaId === undefined ? (
           <div className="flex flex-col">
             <CreateSchemaModal isOpen={isCreateSchemaModalOpen} setIsOpen={setIsCreateSchemaModalOpen} />
@@ -57,7 +58,7 @@ export function Graph() {
             </Button>
           </div>
         ) : (
-          <div>{`schema id is ${focusedSchemaId}`}</div>
+          <Flow />
         )}
       </div>
     </div>
