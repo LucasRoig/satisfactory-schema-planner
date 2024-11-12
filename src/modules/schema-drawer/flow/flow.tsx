@@ -12,13 +12,18 @@ import {
 } from "@xyflow/react";
 import { type MouseEventHandler, useCallback, useState } from "react";
 import "@xyflow/react/dist/style.css";
+import { SchemaUseCases } from "@/use-cases/schema";
+import { useDebounce } from "@/utils/use-debounce";
+import { useMutation } from "@tanstack/react-query";
 import { v4 as uuid } from "uuid";
+import { useFetchSchema } from "../queries/use-fetch-schema";
+import { useSchemaDrawerContext } from "../schema-drawer-context";
 
-const initialNodes = [
-  { id: "1", position: { x: 0, y: 0 }, data: { label: "1" } },
-  { id: "2", position: { x: 0, y: 100 }, data: { label: "2" } },
-];
-const initialEdges = [{ id: "e1-2", source: "1", target: "2", animated: true }];
+// const initialNodes = [
+//   { id: "1", position: { x: 0, y: 0 }, data: { label: "1" } },
+//   { id: "2", position: { x: 0, y: 100 }, data: { label: "2" } },
+// ];
+// const initialEdges = [{ id: "e1-2", source: "1", target: "2", animated: true }];
 
 export function Flow() {
   return (
@@ -29,12 +34,55 @@ export function Flow() {
 }
 
 function _Flow() {
-  const [nodes, setNodes] = useState<Node[]>(initialNodes);
-  const [edges, setEdges] = useState<Edge[]>(initialEdges);
+  const { focusedSchemaId } = useSchemaDrawerContext();
+  const [nodes, setNodes] = useState<Node[]>([]);
+  const [edges, setEdges] = useState<Edge[]>([]);
+  const updateNodeMutation = useMutation({
+    mutationFn: (args: { schemaId: number; nodes: Node[] }) =>
+      SchemaUseCases.updateSchemaNodes(args.schemaId, args.nodes),
+  });
+  const updateEdgeMutation = useMutation({
+    mutationFn: (args: { schemaId: number; edges: Edge[] }) =>
+      SchemaUseCases.updateSchemaEdges(args.schemaId, args.edges),
+  });
+  const debouncedUpdateNode = useDebounce(updateNodeMutation.mutate, 5000);
+  const debouncedUpdateEdge = useDebounce(updateEdgeMutation.mutate, 5000);
+
+  const _data = useFetchSchema(focusedSchemaId, {
+    onSuccess: (data) => {
+      if (data === undefined) {
+        throw new Error("Schema not found");
+      }
+      setNodes(data.nodes);
+      setEdges(data.edges);
+    },
+  });
   const { screenToFlowPosition, addNodes, updateNodeData: _updateNodeData } = useReactFlow();
 
-  const onNodesChange: OnNodesChange = useCallback((changes) => setNodes((nds) => applyNodeChanges(changes, nds)), []);
-  const onEdgesChange: OnEdgesChange = useCallback((changes) => setEdges((eds) => applyEdgeChanges(changes, eds)), []);
+  const onNodesChange: OnNodesChange = useCallback(
+    (changes) => {
+      setNodes((nds) => {
+        const newNodes = applyNodeChanges(changes, nds);
+        if (focusedSchemaId !== undefined) {
+          debouncedUpdateNode({ schemaId: focusedSchemaId, nodes: newNodes });
+        }
+        return newNodes;
+      });
+    },
+    [debouncedUpdateNode, focusedSchemaId],
+  );
+
+  const onEdgesChange: OnEdgesChange = useCallback(
+    (changes) =>
+      setEdges((eds) => {
+        const newEdges = applyEdgeChanges(changes, eds);
+        if (focusedSchemaId !== undefined) {
+          debouncedUpdateEdge({ schemaId: focusedSchemaId, edges: newEdges });
+        }
+        return newEdges;
+      }),
+    [debouncedUpdateEdge, focusedSchemaId],
+  );
 
   const handleDoubleClick: MouseEventHandler = useCallback(
     (e) => {

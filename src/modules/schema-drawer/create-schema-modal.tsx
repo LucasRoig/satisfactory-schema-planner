@@ -52,6 +52,8 @@ export function CreateSchemaModal(props: {
         profileId: selectedProfile.id,
         icon: undefined,
         path: schema.path,
+        nodes: [],
+        edges: [],
       });
     },
     onSuccess: (data) => {

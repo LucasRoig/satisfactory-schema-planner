@@ -1,3 +1,4 @@
+import type { Edge, Node } from "@xyflow/react";
 import type { EntityTable } from "dexie";
 import { z } from "zod";
 
@@ -7,6 +8,8 @@ export type Schema = {
   icon: string | undefined;
   profileId: number;
   path: string;
+  nodes: Node[];
+  edges: Edge[];
 };
 
 const allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_/";
@@ -25,4 +28,4 @@ export type SchemaTable = EntityTable<
   "id" // primary key "id" (for the typings only)
 >;
 
-export const schemaStrDef = "++id, name, icon, profileId, path";
+export const schemaStrDef = "++id, name, icon, profileId, path, edges, nodes";

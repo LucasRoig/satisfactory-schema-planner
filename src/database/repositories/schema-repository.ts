@@ -1,3 +1,4 @@
+import type { Edge, Node } from "@xyflow/react";
 import type { DexieDbType, Schema } from "../database";
 import { isSchemaValid } from "../types/schema";
 import { ProfileRepository } from "./profile-repository";
@@ -29,5 +30,20 @@ export class SchemaRepository {
       ...schema,
       id,
     };
+  }
+
+  public async findById(id: number) {
+    const schema = await this.db.schemas.get(id);
+    return schema;
+  }
+
+  public async updateSchemaNodes(schemaId: number, nodes: Node[]) {
+    await this.db.schemas.update(schemaId, { nodes });
+    return this.db.schemas.get(schemaId);
+  }
+
+  public async updateSchemaEdges(schemaId: number, edges: Edge[]) {
+    await this.db.schemas.update(schemaId, { edges });
+    return this.db.schemas.get(schemaId);
   }
 }
