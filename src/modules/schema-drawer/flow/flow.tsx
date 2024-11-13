@@ -5,7 +5,6 @@ import {
   type OnConnect,
   type OnEdgesChange,
   type OnNodesChange,
-  Position,
   ReactFlow,
   ReactFlowProvider,
   applyEdgeChanges,
@@ -18,6 +17,7 @@ import { SchemaUseCases } from "@/use-cases/schema";
 import { useDebounce } from "@/utils/use-debounce";
 import { useMutation } from "@tanstack/react-query";
 import { v4 as uuid } from "uuid";
+import { newSourceNode } from "../nodes/nodes-types";
 import { SourceNode } from "../nodes/source-node";
 import { ConfigPanel } from "../panels/config-panel";
 import { useFetchSchema } from "../queries/use-fetch-schema";
@@ -104,7 +104,7 @@ function _Flow() {
   const handleDoubleClick: MouseEventHandler = useCallback(
     (e) => {
       const { x, y } = screenToFlowPosition({ x: e.clientX, y: e.clientY });
-      addNodes([{ id: uuid(), type: "source", position: { x, y }, data: { orientation: Position.Right } }]);
+      addNodes([newSourceNode({ x, y })]);
     },
     [screenToFlowPosition, addNodes],
   );
