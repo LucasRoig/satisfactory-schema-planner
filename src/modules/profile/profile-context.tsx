@@ -5,6 +5,7 @@ import React, { useContext } from "react";
 import { CreateProfileModal } from "./create-profile-modal";
 import { type FetchAllProfilesResults, useQueryFetchAllProfiles } from "./queries/use-query-fetch-all-profiles";
 import { type FetchSchemasResults, useQueryFetchAllSchemas } from "./queries/use-query-fetch-all-schemas";
+import { useItemsForProfile, type FetchItemsResults } from "../settings/queries/useItemsForProfile";
 
 type ProfileContextType = {
   profiles: FetchAllProfilesResults["profiles"] | undefined;
@@ -13,6 +14,7 @@ type ProfileContextType = {
   status: "error" | "success" | "pending";
   openCreateProfileModal: () => void;
   schemas: Map<number, FetchSchemasResults[number]>;
+  items: Map<number, FetchItemsResults[number]>;
 };
 
 export type ProfileContextProviderProps = {
@@ -26,6 +28,7 @@ export const ProfileContextProvider: React.FC<ProfileContextProviderProps> = (pr
   const [isCreateProfileModalOpen, setIsCreateProfileModalOpen] = React.useState(false);
 
   const { data: schemas } = useQueryFetchAllSchemas(selectedProfile?.id);
+  const { data: items } = useItemsForProfile(selectedProfile?.id);
 
   const { data: profiles, status } = useQueryFetchAllProfiles({
     onSuccess: (results) => {
@@ -64,6 +67,7 @@ export const ProfileContextProvider: React.FC<ProfileContextProviderProps> = (pr
       }
     },
     schemas: new Map(schemas.map((s) => [s.id, s])),
+    items: new Map(items.map((i) => [i.id, i])),
   };
 
   return (

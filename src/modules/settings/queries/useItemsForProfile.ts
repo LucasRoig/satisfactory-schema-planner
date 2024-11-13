@@ -1,15 +1,15 @@
-import { useProfileContext } from "@/modules/profile/profile-context";
 import { ItemsUseCases } from "@/use-cases/item";
 import { useQuery } from "@tanstack/react-query";
 
-export function useItemsForProfile() {
-  const { selectedProfile } = useProfileContext();
+export type FetchItemsResults = Awaited<ReturnType<typeof ItemsUseCases.fetchProfileItems>>;
+
+export function useItemsForProfile(profileId: number | undefined) {
   const query = useQuery({
-    queryKey: ["items", selectedProfile?.id],
-    enabled: selectedProfile !== undefined,
+    queryKey: ["items", profileId],
+    enabled: profileId !== undefined,
     initialData: [],
     queryFn: async () => {
-      const items = await ItemsUseCases.fetchProfileItems(selectedProfile!.id);
+      const items = await ItemsUseCases.fetchProfileItems(profileId!);
       return items;
     },
   });

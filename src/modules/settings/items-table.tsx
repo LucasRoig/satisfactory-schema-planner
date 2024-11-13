@@ -17,6 +17,7 @@ import { PlusCircle } from "lucide-react";
 import React from "react";
 import { useItemsForProfile } from "./queries/useItemsForProfile";
 import { useSettingsContext } from "./settings-context";
+import { useProfileContext } from "../profile/profile-context";
 
 type Item = {
   id: number;
@@ -36,7 +37,8 @@ const columns = [
 ] as const satisfies ColumnDef<Item, unknown>[];
 
 export function ItemsTable() {
-  const { data: items } = useItemsForProfile();
+  const { selectedProfile } = useProfileContext();
+  const { data: items } = useItemsForProfile(selectedProfile?.id);
   const { openItemDetails, openCreateItem } = useSettingsContext();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);

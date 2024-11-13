@@ -4,4 +4,5 @@ export const isSourceNode = (node: Node): node is SourceNode => node.type === "s
 
 export type SourceNode = Node<{
   orientation: Position;
+  itemId: number | undefined;
 }>;
