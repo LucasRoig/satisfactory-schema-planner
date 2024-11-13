@@ -2,6 +2,7 @@ import {
   Background,
   type Edge,
   type Node,
+  type OnConnect,
   type OnEdgesChange,
   type OnNodesChange,
   ReactFlow,
@@ -57,10 +58,11 @@ function _Flow() {
       setEdges(data.edges);
     },
   });
-  const { screenToFlowPosition, addNodes, updateNodeData: _updateNodeData } = useReactFlow();
+  const { screenToFlowPosition, addNodes, addEdges, updateNodeData: _updateNodeData } = useReactFlow();
 
   const onNodesChange: OnNodesChange = useCallback(
     (changes) => {
+      console.log("onNodesChange", changes);
       setNodes((nds) => {
         const newNodes = applyNodeChanges(changes, nds);
         if (focusedSchemaId !== undefined) {
@@ -84,6 +86,13 @@ function _Flow() {
     [debouncedUpdateEdge, focusedSchemaId],
   );
 
+  const onConnect: OnConnect = useCallback(
+    (params) => {
+      addEdges([{ id: uuid(), source: params.source, target: params.target, animated: true }]);
+    },
+    [addEdges],
+  );
+
   const handleDoubleClick: MouseEventHandler = useCallback(
     (e) => {
       const { x, y } = screenToFlowPosition({ x: e.clientX, y: e.clientY });
@@ -100,6 +109,7 @@ function _Flow() {
       edges={edges}
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
+      onConnect={onConnect}
     >
       <Background />
     </ReactFlow>
