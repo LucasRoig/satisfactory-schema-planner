@@ -1,12 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Handle, type Node, type NodeProps, Position, useReactFlow } from "@xyflow/react";
+import { Handle, type NodeProps, Position, useReactFlow } from "@xyflow/react";
 import { CornerLeftDown, CornerRightDown } from "lucide-react";
 import { BaseNode } from "./base-node";
-
-type SourceNode = Node<{
-  orientation: Position;
-}>;
+import type { SourceNode as SourceNodeType } from "./nodes-types";
 
 const ORIENTATIONS = [Position.Right, Position.Bottom, Position.Left, Position.Top];
 
@@ -25,7 +22,7 @@ const rotate = (initialOrientation: Position | undefined, delta: number) => {
   return ORIENTATIONS[nextIndex];
 };
 
-export function SourceNode(props: NodeProps<SourceNode>) {
+export function SourceNode(props: NodeProps<SourceNodeType>) {
   return (
     <BaseNode
       className={cn(
@@ -41,7 +38,7 @@ export function SourceNode(props: NodeProps<SourceNode>) {
   );
 }
 
-function RotationControls(props: NodeProps<SourceNode>) {
+function RotationControls(props: NodeProps<SourceNodeType>) {
   const { updateNodeData } = useReactFlow();
 
   const onRotateRight = () => updateNodeData(props.id, { orientation: rotate(props.data.orientation, 1) });

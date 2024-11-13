@@ -1,8 +1,18 @@
 import { type Node, Panel } from "@xyflow/react";
+import type { ReactNode } from "react";
+import { isSourceNode } from "../nodes/nodes-types";
+import { SourceConfigPanel } from "./source-config-panel";
 
 export function ConfigPanel(props: { nodes: Node[] }) {
   const selectedNode = props.nodes.find((n) => n.selected);
   if (selectedNode === undefined) {
+    return null;
+  }
+  let component: ReactNode = null;
+  if (isSourceNode(selectedNode)) {
+    component = <SourceConfigPanel node={selectedNode} />;
+  }
+  if (component === null) {
     return null;
   }
   return (
@@ -14,7 +24,7 @@ export function ConfigPanel(props: { nodes: Node[] }) {
         bottom: "2.5rem",
       }}
     >
-      Test Panel
+      {component}
     </Panel>
   );
 }
