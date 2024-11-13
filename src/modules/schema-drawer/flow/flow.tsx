@@ -19,6 +19,7 @@ import { useDebounce } from "@/utils/use-debounce";
 import { useMutation } from "@tanstack/react-query";
 import { v4 as uuid } from "uuid";
 import { SourceNode } from "../nodes/source-node";
+import { ConfigPanel } from "../panels/config-panel";
 import { useFetchSchema } from "../queries/use-fetch-schema";
 import { useSchemaDrawerContext } from "../schema-drawer-context";
 
@@ -44,6 +45,7 @@ function _Flow() {
   const { focusedSchemaId } = useSchemaDrawerContext();
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
+  console.log("nodes", nodes);
   const updateNodeMutation = useMutation({
     mutationFn: (args: { schemaId: number; nodes: Node[] }) =>
       SchemaUseCases.updateSchemaNodes(args.schemaId, args.nodes),
@@ -118,6 +120,7 @@ function _Flow() {
       onConnect={onConnect}
       nodeTypes={nodeTypes}
     >
+      <ConfigPanel nodes={nodes} />
       <Background />
     </ReactFlow>
   );

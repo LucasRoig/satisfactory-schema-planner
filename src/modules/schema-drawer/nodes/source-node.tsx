@@ -26,10 +26,6 @@ const rotate = (initialOrientation: Position | undefined, delta: number) => {
 };
 
 export function SourceNode(props: NodeProps<SourceNode>) {
-  const { updateNodeData } = useReactFlow();
-
-  const onRotateRight = () => updateNodeData(props.id, { orientation: rotate(props.data.orientation, 1) });
-  const onRotateLeft = () => updateNodeData(props.id, { orientation: rotate(props.data.orientation, -1) });
   return (
     <BaseNode
       className={cn(
@@ -38,6 +34,21 @@ export function SourceNode(props: NodeProps<SourceNode>) {
       )}
       selected={props.selected}
     >
+      {props.selected && <RotationControls {...props} />}
+      Source
+      <Handle type="source" position={props.data.orientation} />
+    </BaseNode>
+  );
+}
+
+function RotationControls(props: NodeProps<SourceNode>) {
+  const { updateNodeData } = useReactFlow();
+
+  const onRotateRight = () => updateNodeData(props.id, { orientation: rotate(props.data.orientation, 1) });
+  const onRotateLeft = () => updateNodeData(props.id, { orientation: rotate(props.data.orientation, -1) });
+
+  return (
+    <>
       <Button
         onClick={onRotateLeft}
         size="icon"
@@ -54,8 +65,6 @@ export function SourceNode(props: NodeProps<SourceNode>) {
       >
         <CornerRightDown />
       </Button>
-      Source
-      <Handle type="source" position={props.data.orientation} />
-    </BaseNode>
+    </>
   );
 }
