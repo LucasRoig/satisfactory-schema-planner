@@ -1,13 +1,13 @@
-import React from "react";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { Button } from "./ui/button";
-import { Check, ChevronsUpDown } from "lucide-react";
-import { CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, Command } from "./ui/command";
 import { cn } from "@/lib/utils";
 import { useProfileContext } from "@/modules/profile/profile-context";
+import { Check, ChevronsUpDown } from "lucide-react";
+import React from "react";
+import { Button } from "./ui/button";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "./ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 
-export function ItemCombobox(props: { selectedItemId?: number, onSelect?: (itemId: number) => void }) {
-  const {selectedItemId, onSelect} = props;
+export function ItemCombobox(props: { selectedItemId?: number; onSelect?: (itemId: number) => void }) {
+  const { selectedItemId, onSelect } = props;
   const { items } = useProfileContext();
   const [open, setOpen] = React.useState(false);
 

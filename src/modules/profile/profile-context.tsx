@@ -2,10 +2,10 @@ import type { InsertProfile } from "@/database/repositories/profile-repository";
 import { ProfileUseCases } from "@/use-cases/profile";
 import { useMutation } from "@tanstack/react-query";
 import React, { useContext } from "react";
+import { type FetchItemsResults, useItemsForProfile } from "../settings/queries/useItemsForProfile";
 import { CreateProfileModal } from "./create-profile-modal";
 import { type FetchAllProfilesResults, useQueryFetchAllProfiles } from "./queries/use-query-fetch-all-profiles";
 import { type FetchSchemasResults, useQueryFetchAllSchemas } from "./queries/use-query-fetch-all-schemas";
-import { useItemsForProfile, type FetchItemsResults } from "../settings/queries/useItemsForProfile";
 
 type ProfileContextType = {
   profiles: FetchAllProfilesResults["profiles"] | undefined;

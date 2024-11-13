@@ -15,9 +15,9 @@ import {
 } from "@tanstack/react-table";
 import { PlusCircle } from "lucide-react";
 import React from "react";
+import { useProfileContext } from "../profile/profile-context";
 import { useItemsForProfile } from "./queries/useItemsForProfile";
 import { useSettingsContext } from "./settings-context";
-import { useProfileContext } from "../profile/profile-context";
 
 type Item = {
   id: number;
