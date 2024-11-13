@@ -5,6 +5,7 @@ import {
   type OnConnect,
   type OnEdgesChange,
   type OnNodesChange,
+  Position,
   ReactFlow,
   ReactFlowProvider,
   applyEdgeChanges,
@@ -17,6 +18,7 @@ import { SchemaUseCases } from "@/use-cases/schema";
 import { useDebounce } from "@/utils/use-debounce";
 import { useMutation } from "@tanstack/react-query";
 import { v4 as uuid } from "uuid";
+import { SourceNode } from "../nodes/source-node";
 import { useFetchSchema } from "../queries/use-fetch-schema";
 import { useSchemaDrawerContext } from "../schema-drawer-context";
 
@@ -25,6 +27,10 @@ import { useSchemaDrawerContext } from "../schema-drawer-context";
 //   { id: "2", position: { x: 0, y: 100 }, data: { label: "2" } },
 // ];
 // const initialEdges = [{ id: "e1-2", source: "1", target: "2", animated: true }];
+
+const nodeTypes = {
+  source: SourceNode,
+};
 
 export function Flow() {
   return (
@@ -96,7 +102,7 @@ function _Flow() {
   const handleDoubleClick: MouseEventHandler = useCallback(
     (e) => {
       const { x, y } = screenToFlowPosition({ x: e.clientX, y: e.clientY });
-      addNodes([{ id: uuid(), position: { x, y }, data: { label: "New Node" } }]);
+      addNodes([{ id: uuid(), type: "source", position: { x, y }, data: { orientation: Position.Right } }]);
     },
     [screenToFlowPosition, addNodes],
   );
@@ -110,6 +116,7 @@ function _Flow() {
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
       onConnect={onConnect}
+      nodeTypes={nodeTypes}
     >
       <Background />
     </ReactFlow>
