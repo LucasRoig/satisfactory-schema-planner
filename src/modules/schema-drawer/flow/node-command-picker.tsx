@@ -21,6 +21,11 @@ const basicNodes: NodeItem[] = [
     type: "source",
     description: "Produces items.",
   },
+  {
+    name: "Splitter",
+    type: "splitter",
+    description: "Splits an input into three outputs.",
+  }
 ];
 
 export function NodeCommandPicker(props: {

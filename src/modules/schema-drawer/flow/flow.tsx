@@ -24,6 +24,7 @@ import { ConfigPanel } from "../panels/config-panel";
 import { useFetchSchema } from "../queries/use-fetch-schema";
 import { useSchemaDrawerContext } from "../schema-drawer-context";
 import { NodeCommandPicker } from "./node-command-picker";
+import { SplitterNode } from "../nodes/splitter-node";
 
 // const initialNodes = [
 //   { id: "1", position: { x: 0, y: 0 }, data: { label: "1" } },
@@ -33,6 +34,7 @@ import { NodeCommandPicker } from "./node-command-picker";
 
 const nodeTypes = {
   source: SourceNode,
+  splitter: SplitterNode,
 };
 
 export function Flow() {
