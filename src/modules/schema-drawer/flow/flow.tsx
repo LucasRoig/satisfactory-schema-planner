@@ -7,21 +7,23 @@ import {
   type OnNodesChange,
   ReactFlow,
   ReactFlowProvider,
+  type XYPosition,
   applyEdgeChanges,
   applyNodeChanges,
   useReactFlow,
 } from "@xyflow/react";
-import { type MouseEventHandler, useCallback, useState } from "react";
+import { type MouseEventHandler, type ReactElement, createContext, useCallback, useRef, useState } from "react";
 import "@xyflow/react/dist/style.css";
 import { SchemaUseCases } from "@/use-cases/schema";
 import { useDebounce } from "@/utils/use-debounce";
 import { useMutation } from "@tanstack/react-query";
 import { v4 as uuid } from "uuid";
-import { newSourceNode } from "../nodes/nodes-types";
+import { type NodeType, nodeFactory } from "../nodes/nodes-types";
 import { SourceNode } from "../nodes/source-node";
 import { ConfigPanel } from "../panels/config-panel";
 import { useFetchSchema } from "../queries/use-fetch-schema";
 import { useSchemaDrawerContext } from "../schema-drawer-context";
+import { NodeCommandPicker } from "./node-command-picker";
 
 // const initialNodes = [
 //   { id: "1", position: { x: 0, y: 0 }, data: { label: "1" } },
@@ -45,7 +47,7 @@ function _Flow() {
   const { focusedSchemaId } = useSchemaDrawerContext();
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
-  console.log("nodes", nodes);
+
   const updateNodeMutation = useMutation({
     mutationFn: (args: { schemaId: number; nodes: Node[] }) =>
       SchemaUseCases.updateSchemaNodes(args.schemaId, args.nodes),
@@ -66,7 +68,7 @@ function _Flow() {
       setEdges(data.edges);
     },
   });
-  const { screenToFlowPosition, addNodes, addEdges, updateNodeData: _updateNodeData } = useReactFlow();
+  const { addEdges, updateNodeData: _updateNodeData } = useReactFlow();
 
   const onNodesChange: OnNodesChange = useCallback(
     (changes) => {
@@ -101,27 +103,60 @@ function _Flow() {
     [addEdges],
   );
 
+  return (
+    <DoubleClickHandlerContextProvider>
+      <doubleClickHandlerContext.Consumer>
+        {(ctx) => (
+          <>
+            <ReactFlow
+              zoomOnDoubleClick={false}
+              onDoubleClick={ctx?.handleDoubleClick}
+              nodes={nodes}
+              edges={edges}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              onConnect={onConnect}
+              nodeTypes={nodeTypes}
+            >
+              <ConfigPanel nodes={nodes} />
+              <Background />
+            </ReactFlow>
+          </>
+        )}
+      </doubleClickHandlerContext.Consumer>
+    </DoubleClickHandlerContextProvider>
+  );
+}
+
+const doubleClickHandlerContext = createContext<{ handleDoubleClick: MouseEventHandler } | undefined>(undefined);
+
+const DoubleClickHandlerContextProvider = ({ children }: { children: ReactElement }) => {
+  const lastDoubleClickPosition = useRef<XYPosition>();
+  const { addNodes, screenToFlowPosition } = useReactFlow();
+
+  const [isNodePickerOpen, setIsNodePickerOpen] = useState(false);
+  const insertNode = useCallback(
+    (type: NodeType) => {
+      if (lastDoubleClickPosition.current === undefined) {
+        return;
+      }
+      addNodes([nodeFactory(type, lastDoubleClickPosition.current)]);
+    },
+    [addNodes],
+  );
   const handleDoubleClick: MouseEventHandler = useCallback(
     (e) => {
       const { x, y } = screenToFlowPosition({ x: e.clientX, y: e.clientY });
-      addNodes([newSourceNode({ x, y })]);
+      lastDoubleClickPosition.current = { x, y };
+      setIsNodePickerOpen(true);
     },
-    [screenToFlowPosition, addNodes],
+    [screenToFlowPosition],
   );
-
   return (
-    <ReactFlow
-      zoomOnDoubleClick={false}
-      onDoubleClick={handleDoubleClick}
-      nodes={nodes}
-      edges={edges}
-      onNodesChange={onNodesChange}
-      onEdgesChange={onEdgesChange}
-      onConnect={onConnect}
-      nodeTypes={nodeTypes}
-    >
-      <ConfigPanel nodes={nodes} />
-      <Background />
-    </ReactFlow>
+    <doubleClickHandlerContext.Provider value={{ handleDoubleClick }}>
+      <NodeCommandPicker isOpen={isNodePickerOpen} setIsOpen={setIsNodePickerOpen} onSelect={insertNode} />
+
+      {children}
+    </doubleClickHandlerContext.Provider>
   );
-}
+};
