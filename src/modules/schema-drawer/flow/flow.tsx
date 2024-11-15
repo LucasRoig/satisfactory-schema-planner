@@ -20,11 +20,11 @@ import { useMutation } from "@tanstack/react-query";
 import { v4 as uuid } from "uuid";
 import { type NodeType, nodeFactory } from "../nodes/nodes-types";
 import { SourceNode } from "../nodes/source-node";
+import { SplitterNode } from "../nodes/splitter-node";
 import { ConfigPanel } from "../panels/config-panel";
 import { useFetchSchema } from "../queries/use-fetch-schema";
 import { useSchemaDrawerContext } from "../schema-drawer-context";
 import { NodeCommandPicker } from "./node-command-picker";
-import { SplitterNode } from "../nodes/splitter-node";
 
 // const initialNodes = [
 //   { id: "1", position: { x: 0, y: 0 }, data: { label: "1" } },
@@ -53,10 +53,16 @@ function _Flow() {
   const updateNodeMutation = useMutation({
     mutationFn: (args: { schemaId: number; nodes: Node[] }) =>
       SchemaUseCases.updateSchemaNodes(args.schemaId, args.nodes),
+    meta: {
+      invalidates: "none",
+    },
   });
   const updateEdgeMutation = useMutation({
     mutationFn: (args: { schemaId: number; edges: Edge[] }) =>
       SchemaUseCases.updateSchemaEdges(args.schemaId, args.edges),
+    meta: {
+      invalidates: "none",
+    },
   });
   const debouncedUpdateNode = useDebounce(updateNodeMutation.mutate, 5000);
   const debouncedUpdateEdge = useDebounce(updateEdgeMutation.mutate, 5000);
@@ -74,7 +80,6 @@ function _Flow() {
 
   const onNodesChange: OnNodesChange = useCallback(
     (changes) => {
-      console.log("onNodesChange", changes);
       setNodes((nds) => {
         const newNodes = applyNodeChanges(changes, nds);
         if (focusedSchemaId !== undefined) {

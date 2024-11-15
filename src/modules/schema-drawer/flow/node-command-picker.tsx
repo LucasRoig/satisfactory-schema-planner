@@ -25,7 +25,7 @@ const basicNodes: NodeItem[] = [
     name: "Splitter",
     type: "splitter",
     description: "Splits an input into three outputs.",
-  }
+  },
 ];
 
 export function NodeCommandPicker(props: {

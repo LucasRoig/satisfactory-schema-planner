@@ -25,7 +25,7 @@ const newSourceNode = (position: XYPosition): SourceNode => ({
 
 export type SplitterNode = Node<{
   orientation: Position;
-}>
+}>;
 
 const newSplitterNode = (position: XYPosition): SplitterNode => ({
   id: uuid(),

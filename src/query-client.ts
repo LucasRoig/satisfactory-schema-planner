@@ -6,9 +6,10 @@ export const queryClient = new QueryClient({
     onError: (error) => toast.error(`Something went wrong: ${error.message}`),
   }),
   mutationCache: new MutationCache({
-    onSuccess: () => {
-      // Invalidate all queries when a mutation succeeds
-      queryClient.invalidateQueries();
+    onSuccess: (_data, _variables, _context, mutation) => {
+      if (mutation.meta?.invalidates !== "none") {
+        queryClient.invalidateQueries();
+      }
     },
   }),
 });
