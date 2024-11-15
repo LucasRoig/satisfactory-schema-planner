@@ -2,7 +2,7 @@ import { type Node, Position, type XYPosition } from "@xyflow/react";
 import { match } from "ts-pattern";
 import { v4 as uuid } from "uuid";
 
-export type NodeType = "source" | "splitter";
+export type NodeType = "source" | "splitter" | "merger";
 
 export const isSourceNode = (node: Node): node is SourceNode => node.type === "source";
 
@@ -36,9 +36,23 @@ const newSplitterNode = (position: XYPosition): SplitterNode => ({
   },
 });
 
+export type MergerNode = Node<{
+  orientation: Position;
+}>;
+
+const newMergerNode = (position: XYPosition): MergerNode => ({
+  id: uuid(),
+  type: "merger",
+  position,
+  data: {
+    orientation: Position.Right,
+  },
+});
+
 export const nodeFactory = (type: NodeType, position: XYPosition) => {
   return match(type)
     .with("source", () => newSourceNode(position))
+    .with("merger", () => newMergerNode(position))
     .with("splitter", () => newSplitterNode(position))
     .exhaustive();
 };

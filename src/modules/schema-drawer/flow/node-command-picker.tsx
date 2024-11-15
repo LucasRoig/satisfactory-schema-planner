@@ -26,6 +26,11 @@ const basicNodes: NodeItem[] = [
     type: "splitter",
     description: "Splits an input into three outputs.",
   },
+  {
+    name: "Merger",
+    type: "merger",
+    description: "Merges three inputs into one output.",
+  },
 ];
 
 export function NodeCommandPicker(props: {
