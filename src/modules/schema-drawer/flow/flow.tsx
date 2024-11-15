@@ -53,6 +53,9 @@ function _Flow() {
   const updateNodeMutation = useMutation({
     mutationFn: (args: { schemaId: number; nodes: Node[] }) =>
       SchemaUseCases.updateSchemaNodes(args.schemaId, args.nodes),
+    onSuccess: () => {
+      console.info("saved nodes");
+    },
     meta: {
       invalidates: "none",
     },
@@ -60,6 +63,9 @@ function _Flow() {
   const updateEdgeMutation = useMutation({
     mutationFn: (args: { schemaId: number; edges: Edge[] }) =>
       SchemaUseCases.updateSchemaEdges(args.schemaId, args.edges),
+    onSuccess: () => {
+      console.info("saved edges");
+    },
     meta: {
       invalidates: "none",
     },
@@ -116,6 +122,7 @@ function _Flow() {
         {(ctx) => (
           <>
             <ReactFlow
+              deleteKeyCode="Delete"
               zoomOnDoubleClick={false}
               onDoubleClick={ctx?.handleDoubleClick}
               nodes={nodes}
