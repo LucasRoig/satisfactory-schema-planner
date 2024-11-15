@@ -32,7 +32,7 @@ const newSplitterNode = (position: XYPosition): SplitterNode => ({
   type: "splitter",
   position,
   data: {
-    orientation: Position.Right,
+    orientation: Position.Left,
   },
 });
 
