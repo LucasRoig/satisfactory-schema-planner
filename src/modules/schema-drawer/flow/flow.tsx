@@ -75,7 +75,7 @@ function _Flow() {
   const debouncedUpdateNode = useDebounce(updateNodeMutation.mutate, 5000);
   const debouncedUpdateEdge = useDebounce(updateEdgeMutation.mutate, 5000);
 
-  const _data = useFetchSchema(focusedSchemaId, {
+  const { data: _data } = useFetchSchema(focusedSchemaId, {
     onSuccess: (data) => {
       if (data === undefined) {
         throw new Error("Schema not found");

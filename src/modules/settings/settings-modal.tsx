@@ -1,5 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { match } from "ts-pattern";
+import { BuildingCreate } from "./building-create";
+import { BuildingDetails } from "./building-details";
 import { Home } from "./home";
 import { ItemsCreate } from "./items-create";
 import { ItemsDetails } from "./items-details";
@@ -15,7 +17,8 @@ export function SettingsModal(props: {
     .with({ screen: "HOME" }, () => <Home />)
     .with({ screen: "ITEM_DETAILS" }, () => <ItemsDetails />)
     .with({ screen: "CREATE_ITEM" }, () => <ItemsCreate />)
-    .with({ screen: "BUILDING_DETAILS" }, () => <div />)
+    .with({ screen: "BUILDING_DETAILS" }, () => <BuildingDetails />)
+    .with({ screen: "CREATE_BUILDING" }, () => <BuildingCreate />)
     .exhaustive();
 
   const title = match(screen)
@@ -23,6 +26,7 @@ export function SettingsModal(props: {
     .with({ screen: "ITEM_DETAILS" }, () => "Item details")
     .with({ screen: "CREATE_ITEM" }, () => "Create an item")
     .with({ screen: "BUILDING_DETAILS" }, () => "Building details")
+    .with({ screen: "CREATE_BUILDING" }, () => "Create a building")
     .exhaustive();
 
   return (

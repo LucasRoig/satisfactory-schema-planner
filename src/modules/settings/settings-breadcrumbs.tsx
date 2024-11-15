@@ -19,6 +19,7 @@ export function SettingsBreadcrumbs() {
     .with({ screen: "ITEM_DETAILS" }, (s) => <ItemDetailsBreadcrumbs itemId={s.itemId} />)
     .with({ screen: "CREATE_ITEM" }, () => <CreateItemBreadcrumbs />)
     .with({ screen: "BUILDING_DETAILS" }, (s) => <BuildindDetailsBreadcrumbs buildingId={s.buildingId} />)
+    .with({ screen: "CREATE_BUILDING" }, () => <CreateBuildingBreadcrumbs />)
     .exhaustive();
 
   return (
@@ -62,6 +63,18 @@ const BuildindDetailsBreadcrumbs = (props: { buildingId: number }) => {
           <BreadcrumbPage>Building: {props.buildingId}</BreadcrumbPage>
         </BreadcrumbItem>
       </>
+    </>
+  );
+};
+
+const CreateBuildingBreadcrumbs = () => {
+  return (
+    <>
+      <HomeItem />
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbPage>Create Building</BreadcrumbPage>
+      </BreadcrumbItem>
     </>
   );
 };
