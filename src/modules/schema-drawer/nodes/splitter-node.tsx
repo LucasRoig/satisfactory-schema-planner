@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
-import { Handle, type NodeProps, Position } from "@xyflow/react";
+import { type NodeProps, Position } from "@xyflow/react";
 import { BaseNode } from "./base-node";
+import { CustomHandle } from "./custom-handle";
 import type { SplitterNode as SplitterNodeType } from "./nodes-types";
 
 export function SplitterNode(props: NodeProps<SplitterNodeType>) {
@@ -14,10 +15,10 @@ export function SplitterNode(props: NodeProps<SplitterNodeType>) {
     >
       {/* {props.selected && <RotationControls {...props} />} */}
       Splitter
-      <Handle type="source" position={Position.Right} />
-      <Handle type="source" position={Position.Top} />
-      <Handle type="target" position={Position.Left} />
-      <Handle type="source" position={Position.Bottom} />
+      <CustomHandle type="source" position={Position.Right} />
+      <CustomHandle type="source" position={Position.Top} />
+      <CustomHandle type="target" position={Position.Left} />
+      <CustomHandle type="source" position={Position.Bottom} />
     </BaseNode>
   );
 }

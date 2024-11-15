@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Handle, type NodeProps, Position, useReactFlow } from "@xyflow/react";
+import { type NodeProps, Position, useReactFlow } from "@xyflow/react";
 import { CornerLeftDown, CornerRightDown } from "lucide-react";
 import { BaseNode } from "./base-node";
+import { CustomHandle } from "./custom-handle";
 import type { SourceNode as SourceNodeType } from "./nodes-types";
 
 const ORIENTATIONS = [Position.Right, Position.Bottom, Position.Left, Position.Top];
@@ -33,7 +34,7 @@ export function SourceNode(props: NodeProps<SourceNodeType>) {
     >
       {props.selected && <RotationControls {...props} />}
       Source
-      <Handle type="source" position={props.data.orientation} />
+      <CustomHandle type="source" position={props.data.orientation} />
     </BaseNode>
   );
 }
