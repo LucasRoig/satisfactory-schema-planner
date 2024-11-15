@@ -1,11 +1,13 @@
 import { cn } from "@/lib/utils";
-import { type NodeProps, Position } from "@xyflow/react";
+import type { NodeProps } from "@xyflow/react";
 import { BaseNode } from "./base-node";
 import { CustomHandle } from "./custom-handle";
 import type { SplitterNode as SplitterNodeType } from "./nodes-types";
+import { OrientationUtils } from "./orientation-utils";
 import { RotationControls } from "./rotation-controls";
 
 export function SplitterNode(props: NodeProps<SplitterNodeType>) {
+  const orientationIndex = OrientationUtils.getIndex(props.data.orientation);
   return (
     <BaseNode
       className={cn(
@@ -16,13 +18,10 @@ export function SplitterNode(props: NodeProps<SplitterNodeType>) {
     >
       {props.selected && <RotationControls position="far" {...props} />}
       Splitter
-      <CustomHandle type={props.data.orientation === Position.Right ? "target" : "source"} position={Position.Right} />
-      <CustomHandle type={props.data.orientation === Position.Top ? "target" : "source"} position={Position.Top} />
-      <CustomHandle type={props.data.orientation === Position.Left ? "target" : "source"} position={Position.Left} />
-      <CustomHandle
-        type={props.data.orientation === Position.Bottom ? "target" : "source"}
-        position={Position.Bottom}
-      />
+      <CustomHandle id="input0" type="target" position={props.data.orientation} />
+      <CustomHandle id="output0" type="source" position={OrientationUtils.getAtIndex(orientationIndex + 1)} />
+      <CustomHandle id="output1" type="source" position={OrientationUtils.getAtIndex(orientationIndex + 2)} />
+      <CustomHandle id="output2" type="source" position={OrientationUtils.getAtIndex(orientationIndex + 3)} />
     </BaseNode>
   );
 }

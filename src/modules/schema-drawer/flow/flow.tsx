@@ -113,7 +113,7 @@ function _Flow() {
 
   const onConnect: OnConnect = useCallback(
     (params) => {
-      addEdges([{ id: uuid(), source: params.source, target: params.target, animated: true }]);
+      addEdges([{ ...params, id: uuid(), animated: true }]);
     },
     [addEdges],
   );
