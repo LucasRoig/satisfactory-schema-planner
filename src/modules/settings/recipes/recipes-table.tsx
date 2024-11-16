@@ -51,8 +51,8 @@ export function ItemListCell(props: { items: { itemId: number; quantity: number 
   const { items } = useProfileContext();
   return (
     <div>
-      {/* biome-ignore lint/suspicious/noArrayIndexKey: <explanation> */}
       {props.items.map((item, i) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
         <div key={i}>
           {item.quantity} {items.get(item.itemId)?.name}
         </div>
