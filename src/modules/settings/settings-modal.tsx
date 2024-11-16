@@ -20,7 +20,7 @@ export function SettingsModal(props: {
     .with({ screen: "CREATE_ITEM" }, () => <ItemsCreate />)
     .with({ screen: "BUILDING_DETAILS" }, () => <BuildingDetails />)
     .with({ screen: "CREATE_BUILDING" }, () => <BuildingCreate />)
-    .with({ screen: "CREATE_RECIPE" }, () => <RecipesCreate />)
+    .with({ screen: "CREATE_RECIPE" }, (s) => <RecipesCreate buildingId={s.buildingId} />)
     .exhaustive();
 
   const title = match(screen)

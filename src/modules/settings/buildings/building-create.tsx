@@ -13,8 +13,8 @@ import { useSettingsContext } from "../settings-context";
 
 const buildingFormSchema = z.object({
   name: z.string().min(1),
-  inputCount: z.number().min(1),
-  outputCount: z.number().min(1),
+  inputCount: z.coerce.number().min(1),
+  outputCount: z.coerce.number().min(1),
 });
 
 type BuildingFormValues = z.infer<typeof buildingFormSchema>;

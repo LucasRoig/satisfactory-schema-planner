@@ -35,17 +35,31 @@ const columns = [
     header: "Inputs",
     cell: ({ row }) => {
       const recipe = row.original;
-      return recipe.inputs.map((input) => input.itemId).join(", ");
+      return <ItemListCell items={recipe.inputs} />;
     },
   },
   {
     header: "Outputs",
     cell: ({ row }) => {
       const recipe = row.original;
-      return recipe.outputs.map((output) => output.itemId).join(", ");
+      return <ItemListCell items={recipe.outputs} />;
     },
   },
 ] as const satisfies ColumnDef<Recipe, unknown>[];
+
+export function ItemListCell(props: { items: { itemId: number; quantity: number }[] }) {
+  const { items } = useProfileContext();
+  return (
+    <div>
+      {/* biome-ignore lint/suspicious/noArrayIndexKey: <explanation> */}
+      {props.items.map((item, i) => (
+        <div key={i}>
+          {item.quantity} {items.get(item.itemId)?.name}
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export function RecipesTable(props: { buildingId: number }) {
   const { recipes: allRecipes } = useProfileContext();
