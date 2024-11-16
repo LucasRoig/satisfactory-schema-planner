@@ -2,7 +2,7 @@ import { type Node, Position, type XYPosition } from "@xyflow/react";
 import { match } from "ts-pattern";
 import { v4 as uuid } from "uuid";
 
-export type NodeType = "source" | "splitter" | "merger";
+export type NodeType = "source" | "splitter" | "merger" | "building";
 
 export const isSourceNode = (node: Node): node is SourceNode => node.type === "source";
 
@@ -49,10 +49,31 @@ const newMergerNode = (position: XYPosition): MergerNode => ({
   },
 });
 
-export const nodeFactory = (type: NodeType, position: XYPosition) => {
+export type BuildingNode = Node<{
+  buildingId: number;
+  recipeId: number | undefined;
+}>;
+
+const newBuildingNode = (position: XYPosition, buildingId: number): BuildingNode => ({
+  id: uuid(),
+  type: "building",
+  position,
+  data: {
+    buildingId: buildingId,
+    recipeId: undefined,
+  },
+});
+
+export const nodeFactory = (type: NodeType, position: XYPosition, args: { buildingId?: number } = {}) => {
   return match(type)
     .with("source", () => newSourceNode(position))
     .with("merger", () => newMergerNode(position))
     .with("splitter", () => newSplitterNode(position))
+    .with("building", () => {
+      if (args.buildingId === undefined) {
+        throw new Error("buildingId is undefined");
+      }
+      return newBuildingNode(position, args.buildingId);
+    })
     .exhaustive();
 };

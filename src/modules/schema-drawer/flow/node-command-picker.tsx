@@ -7,6 +7,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
+import { useProfileContext } from "@/modules/profile/profile-context";
 import type { NodeType } from "../nodes/nodes-types";
 
 type NodeItem = {
@@ -36,8 +37,10 @@ const basicNodes: NodeItem[] = [
 export function NodeCommandPicker(props: {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
-  onSelect?: (name: NodeType) => void;
+  onSelect?: (name: NodeType, args?: { buildingId?: number }) => void;
 }) {
+  const { buildings } = useProfileContext();
+
   return (
     <CommandDialog open={props.isOpen} onOpenChange={props.setIsOpen}>
       <CommandInput placeholder="Insert a node..." />
@@ -56,6 +59,26 @@ export function NodeCommandPicker(props: {
                 <PseudoFormItem>
                   <PseudoFormLabel>{n.name}</PseudoFormLabel>
                   <PseudoFormDescription>{n.description}</PseudoFormDescription>
+                </PseudoFormItem>
+              </PseudoFormItem>
+            </CommandItem>
+          ))}
+        </CommandGroup>
+        <CommandGroup heading="Buildings">
+          {[...buildings.values()].map((b) => (
+            <CommandItem
+              onSelect={() => {
+                props.onSelect?.("building", { buildingId: b.id });
+                props.setIsOpen(false);
+              }}
+              key={b.id}
+            >
+              <PseudoFormItem>
+                <PseudoFormItem>
+                  <PseudoFormLabel>{b.name}</PseudoFormLabel>
+                  <PseudoFormDescription>
+                    {b.outputCount} outputs, {b.inputCount} inputs
+                  </PseudoFormDescription>
                 </PseudoFormItem>
               </PseudoFormItem>
             </CommandItem>

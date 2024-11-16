@@ -152,11 +152,11 @@ const DoubleClickHandlerContextProvider = ({ children }: { children: ReactElemen
 
   const [isNodePickerOpen, setIsNodePickerOpen] = useState(false);
   const insertNode = useCallback(
-    (type: NodeType) => {
+    (type: NodeType, args?: { buildingId?: number }) => {
       if (lastDoubleClickPosition.current === undefined) {
         return;
       }
-      addNodes([nodeFactory(type, lastDoubleClickPosition.current)]);
+      addNodes([nodeFactory(type, lastDoubleClickPosition.current, args)]);
     },
     [addNodes],
   );
