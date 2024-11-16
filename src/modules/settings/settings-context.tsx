@@ -18,6 +18,10 @@ type SettingScreen =
     }
   | {
       screen: "CREATE_BUILDING";
+    }
+  | {
+      screen: "CREATE_RECIPE";
+      buildingId: number;
     };
 
 type SettingsContextType = {
@@ -27,6 +31,7 @@ type SettingsContextType = {
   openCreateItem: () => void;
   openBuildingDetails: (buildingId: number) => void;
   openCreateBuilding: () => void;
+  openCreateRecipe: (buildingId: number) => void;
   openHome: () => void;
 };
 
@@ -48,6 +53,7 @@ export const SettingsContextProvider: React.FC<SettingsContextProviderProps> = (
     openCreateItem: () => setScreen({ screen: "CREATE_ITEM" }),
     openBuildingDetails: (buildingId: number) => setScreen({ screen: "BUILDING_DETAILS", buildingId }),
     openCreateBuilding: () => setScreen({ screen: "CREATE_BUILDING" }),
+    openCreateRecipe: (buildingId: number) => setScreen({ screen: "CREATE_RECIPE", buildingId }),
   };
 
   return (

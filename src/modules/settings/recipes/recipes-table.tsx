@@ -17,6 +17,7 @@ import {
 import { PlusCircle } from "lucide-react";
 import React from "react";
 import { useMemo } from "react";
+import { useSettingsContext } from "../settings-context";
 
 type MapValue<T> = T extends Map<infer _K, infer V> ? V : never;
 type Recipe = MapValue<ReturnType<typeof useProfileContext>["recipes"]>;
@@ -48,6 +49,7 @@ const columns = [
 
 export function RecipesTable(props: { buildingId: number }) {
   const { recipes: allRecipes } = useProfileContext();
+  const { openCreateRecipe } = useSettingsContext();
 
   const recipes = useMemo(() => {
     return [...allRecipes.values()].filter((recipe) => recipe.buildingId === props.buildingId);
@@ -88,7 +90,7 @@ export function RecipesTable(props: { buildingId: number }) {
             onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)}
             className="max-w-sm"
           />
-          <Button variant="outline" className="ml-auto">
+          <Button variant="outline" className="ml-auto" onClick={() => openCreateRecipe(props.buildingId)}>
             <PlusCircle className="h-5 w-5" />
             Add recipe
           </Button>

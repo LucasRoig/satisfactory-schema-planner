@@ -21,6 +21,7 @@ export function SettingsBreadcrumbs() {
     .with({ screen: "CREATE_ITEM" }, () => <CreateItemBreadcrumbs />)
     .with({ screen: "BUILDING_DETAILS" }, (s) => <BuildindDetailsBreadcrumbs buildingId={s.buildingId} />)
     .with({ screen: "CREATE_BUILDING" }, () => <CreateBuildingBreadcrumbs />)
+    .with({ screen: "CREATE_RECIPE" }, (s) => <CreateRecipeBreadcrumbs buildingId={s.buildingId} />)
     .exhaustive();
 
   return (
@@ -85,6 +86,31 @@ const CreateBuildingBreadcrumbs = () => {
       <BreadcrumbSeparator />
       <BreadcrumbItem>
         <BreadcrumbPage>Create Building</BreadcrumbPage>
+      </BreadcrumbItem>
+    </>
+  );
+};
+
+const CreateRecipeBreadcrumbs = (props: { buildingId: number }) => {
+  const { buildings } = useProfileContext();
+  const { openBuildingDetails } = useSettingsContext();
+  const building = buildings.get(props.buildingId);
+  return (
+    <>
+      <HomeItem />
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbPage className="text-muted-foreground">Buildings</BreadcrumbPage>
+      </BreadcrumbItem>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbLink onClick={() => openBuildingDetails(props.buildingId)} href="#">
+          {building?.name ?? props.buildingId}
+        </BreadcrumbLink>
+      </BreadcrumbItem>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbPage>Add Recipe</BreadcrumbPage>
       </BreadcrumbItem>
     </>
   );

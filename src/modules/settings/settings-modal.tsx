@@ -5,6 +5,7 @@ import { BuildingDetails } from "./buildings/building-details";
 import { Home } from "./home";
 import { ItemsCreate } from "./items/items-create";
 import { ItemsDetails } from "./items/items-details";
+import { RecipesCreate } from "./recipes/recipes-create";
 import { useSettingsContext } from "./settings-context";
 
 export function SettingsModal(props: {
@@ -19,6 +20,7 @@ export function SettingsModal(props: {
     .with({ screen: "CREATE_ITEM" }, () => <ItemsCreate />)
     .with({ screen: "BUILDING_DETAILS" }, () => <BuildingDetails />)
     .with({ screen: "CREATE_BUILDING" }, () => <BuildingCreate />)
+    .with({ screen: "CREATE_RECIPE" }, () => <RecipesCreate />)
     .exhaustive();
 
   const title = match(screen)
@@ -27,6 +29,7 @@ export function SettingsModal(props: {
     .with({ screen: "CREATE_ITEM" }, () => "Create an item")
     .with({ screen: "BUILDING_DETAILS" }, () => "Building details")
     .with({ screen: "CREATE_BUILDING" }, () => "Create a building")
+    .with({ screen: "CREATE_RECIPE" }, () => "Add a recipe")
     .exhaustive();
 
   return (
