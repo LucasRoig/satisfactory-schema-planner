@@ -7,6 +7,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { match } from "ts-pattern";
+import { useProfileContext } from "../profile/profile-context";
 import { useSettingsContext } from "./settings-context";
 
 export function SettingsBreadcrumbs() {
@@ -30,12 +31,18 @@ export function SettingsBreadcrumbs() {
 }
 
 const ItemDetailsBreadcrumbs = (props: { itemId: number }) => {
+  const { items } = useProfileContext();
+  const item = items.get(props.itemId);
   return (
     <>
       <HomeItem />
       <BreadcrumbSeparator />
       <BreadcrumbItem>
-        <BreadcrumbPage>Item: {props.itemId}</BreadcrumbPage>
+        <BreadcrumbPage className="text-muted-foreground">Items</BreadcrumbPage>
+      </BreadcrumbItem>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbPage>{item?.name ?? props.itemId}</BreadcrumbPage>
       </BreadcrumbItem>
     </>
   );
@@ -54,15 +61,19 @@ const CreateItemBreadcrumbs = () => {
 };
 
 const BuildindDetailsBreadcrumbs = (props: { buildingId: number }) => {
+  const { buildings } = useProfileContext();
+  const building = buildings.get(props.buildingId);
   return (
     <>
-      <>
-        <HomeItem />
-        <BreadcrumbSeparator />
-        <BreadcrumbItem>
-          <BreadcrumbPage>Building: {props.buildingId}</BreadcrumbPage>
-        </BreadcrumbItem>
-      </>
+      <HomeItem />
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbPage className="text-muted-foreground">Buildings</BreadcrumbPage>
+      </BreadcrumbItem>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
+        <BreadcrumbPage>{building?.name ?? props.buildingId}</BreadcrumbPage>
+      </BreadcrumbItem>
     </>
   );
 };

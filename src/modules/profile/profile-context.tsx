@@ -2,6 +2,7 @@ import type { InsertProfile } from "@/database/repositories/profile-repository";
 import { ProfileUseCases } from "@/use-cases/profile";
 import { useMutation } from "@tanstack/react-query";
 import React, { useContext } from "react";
+import { type FetchBuildingResults, useBuildingsForProfile } from "../settings/queries/use-buildings-for-profile";
 import { type FetchItemsResults, useItemsForProfile } from "../settings/queries/useItemsForProfile";
 import { CreateProfileModal } from "./create-profile-modal";
 import { type FetchAllProfilesResults, useQueryFetchAllProfiles } from "./queries/use-query-fetch-all-profiles";
@@ -15,6 +16,7 @@ type ProfileContextType = {
   openCreateProfileModal: () => void;
   schemas: Map<number, FetchSchemasResults[number]>;
   items: Map<number, FetchItemsResults[number]>;
+  buildings: Map<number, FetchBuildingResults[number]>;
 };
 
 export type ProfileContextProviderProps = {
@@ -29,6 +31,7 @@ export const ProfileContextProvider: React.FC<ProfileContextProviderProps> = (pr
 
   const { data: schemas } = useQueryFetchAllSchemas(selectedProfile?.id);
   const { data: items } = useItemsForProfile(selectedProfile?.id);
+  const { data: buildings } = useBuildingsForProfile(selectedProfile?.id);
 
   const { data: profiles, status } = useQueryFetchAllProfiles({
     onSuccess: (results) => {
@@ -68,6 +71,7 @@ export const ProfileContextProvider: React.FC<ProfileContextProviderProps> = (pr
     },
     schemas: new Map(schemas.map((s) => [s.id, s])),
     items: new Map(items.map((i) => [i.id, i])),
+    buildings: new Map(buildings.map((b) => [b.id, b])),
   };
 
   return (
