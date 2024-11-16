@@ -15,16 +15,14 @@ import {
 } from "@tanstack/react-table";
 import { PlusCircle } from "lucide-react";
 import React from "react";
-import { useProfileContext } from "../profile/profile-context";
-import { useBuildingsForProfile } from "./queries/use-buildings-for-profile";
-import { useSettingsContext } from "./settings-context";
+import { useProfileContext } from "../../profile/profile-context";
+import { useItemsForProfile } from "../queries/useItemsForProfile";
+import { useSettingsContext } from "../settings-context";
 
-type Building = {
+type Item = {
   id: number;
   name: string;
   icon: string;
-  inputCount: number;
-  outputCount: number;
 };
 
 const columns = [
@@ -36,20 +34,12 @@ const columns = [
     accessorKey: "name",
     header: "Name",
   },
-  {
-    accessorKey: "inputCount",
-    header: "Input Count",
-  },
-  {
-    accessorKey: "outputCount",
-    header: "Output Count",
-  },
-] as const satisfies ColumnDef<Building, unknown>[];
+] as const satisfies ColumnDef<Item, unknown>[];
 
-export function BuildingsTable() {
+export function ItemsTable() {
   const { selectedProfile } = useProfileContext();
-  const { data: items } = useBuildingsForProfile(selectedProfile?.id);
-  const { openBuildingDetails, openCreateBuilding } = useSettingsContext();
+  const { data: items } = useItemsForProfile(selectedProfile?.id);
+  const { openItemDetails, openCreateItem } = useSettingsContext();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -77,17 +67,17 @@ export function BuildingsTable() {
   return (
     <div className="w-full flex flex-col overflow-auto max-h-full h-full">
       <div className="flex flex-col py-4 gap-4">
-        <div className="text-xl">Buildings</div>
+        <div className="text-xl">Items</div>
         <div className="flex items-center gap-4">
           <Input
-            placeholder="Filter buildings..."
+            placeholder="Filter items..."
             value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
             onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)}
             className="max-w-sm"
           />
-          <Button variant="outline" className="ml-auto" onClick={openCreateBuilding}>
+          <Button variant="outline" className="ml-auto" onClick={openCreateItem}>
             <PlusCircle className="h-5 w-5" />
-            Create Building
+            Create Item
           </Button>
         </div>
       </div>
@@ -113,7 +103,7 @@ export function BuildingsTable() {
                   className="cursor-pointer"
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  onClick={() => openBuildingDetails(row.original.id)}
+                  onClick={() => openItemDetails(row.original.id)}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>

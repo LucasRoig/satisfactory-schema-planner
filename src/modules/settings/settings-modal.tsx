@@ -1,10 +1,10 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { match } from "ts-pattern";
-import { BuildingCreate } from "./building-create";
-import { BuildingDetails } from "./building-details";
+import { BuildingCreate } from "./buildings/building-create";
+import { BuildingDetails } from "./buildings/building-details";
 import { Home } from "./home";
-import { ItemsCreate } from "./items-create";
-import { ItemsDetails } from "./items-details";
+import { ItemsCreate } from "./items/items-create";
+import { ItemsDetails } from "./items/items-details";
 import { useSettingsContext } from "./settings-context";
 
 export function SettingsModal(props: {

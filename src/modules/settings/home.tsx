@@ -1,5 +1,5 @@
-import { BuildingsTable } from "./building-table";
-import { ItemsTable } from "./items-table";
+import { BuildingsTable } from "./buildings/building-table";
+import { ItemsTable } from "./items/items-table";
 
 export function Home() {
   return (

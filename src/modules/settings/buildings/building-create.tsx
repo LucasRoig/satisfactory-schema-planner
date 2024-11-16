@@ -7,9 +7,9 @@ import { useMutation } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useProfileContext } from "../profile/profile-context";
-import { SettingsBreadcrumbs } from "./settings-breadcrumbs";
-import { useSettingsContext } from "./settings-context";
+import { useProfileContext } from "../../profile/profile-context";
+import { SettingsBreadcrumbs } from "../settings-breadcrumbs";
+import { useSettingsContext } from "../settings-context";
 
 const buildingFormSchema = z.object({
   name: z.string().min(1),

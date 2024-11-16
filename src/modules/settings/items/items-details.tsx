@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { useProfileContext } from "../profile/profile-context";
-import { SettingsBreadcrumbs } from "./settings-breadcrumbs";
-import { useSettingsContext } from "./settings-context";
+import { useProfileContext } from "../../profile/profile-context";
+import { SettingsBreadcrumbs } from "../settings-breadcrumbs";
+import { useSettingsContext } from "../settings-context";
 
 export function ItemsDetails() {
   const { screen, openHome } = useSettingsContext();
