@@ -11,6 +11,11 @@ export class BuildingRepository {
     return buildings;
   }
 
+  public async findById(id: number) {
+    const building = await this.db.buildings.get(id);
+    return building;
+  }
+
   public async insert(building: InsertBuilding) {
     const profileId = building.profileId;
     const profileRepo = new ProfileRepository(this.db);

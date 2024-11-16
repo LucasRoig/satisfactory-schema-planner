@@ -11,6 +11,11 @@ export class ItemRepository {
     return items;
   }
 
+  public async findById(id: number) {
+    const item = await this.db.items.get(id);
+    return item;
+  }
+
   public async insert(item: InsertItem) {
     const profileId = item.profileId;
     const profileRepo = new ProfileRepository(this.db);
