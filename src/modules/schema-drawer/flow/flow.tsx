@@ -18,6 +18,7 @@ import { SchemaUseCases } from "@/use-cases/schema";
 import { useDebounce } from "@/utils/use-debounce";
 import { useMutation } from "@tanstack/react-query";
 import { v4 as uuid } from "uuid";
+import { BuildingNode } from "../nodes/building-node";
 import { MergerNode } from "../nodes/merger-node";
 import { type NodeType, nodeFactory } from "../nodes/nodes-types";
 import { SourceNode } from "../nodes/source-node";
@@ -37,6 +38,7 @@ const nodeTypes = {
   source: SourceNode,
   splitter: SplitterNode,
   merger: MergerNode,
+  building: BuildingNode,
 };
 
 export function Flow() {
