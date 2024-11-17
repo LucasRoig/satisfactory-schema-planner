@@ -1,6 +1,7 @@
 import {
   Background,
   type Edge,
+  type IsValidConnection,
   type Node,
   type OnConnect,
   type OnEdgesChange,
@@ -10,6 +11,7 @@ import {
   type XYPosition,
   applyEdgeChanges,
   applyNodeChanges,
+  getOutgoers,
   useReactFlow,
 } from "@xyflow/react";
 import { type MouseEventHandler, type ReactElement, createContext, useCallback, useRef, useState } from "react";
@@ -51,8 +53,38 @@ export function Flow() {
 
 function _Flow() {
   const { focusedSchemaId } = useSchemaDrawerContext();
+  const { getNodes, getEdges } = useReactFlow();
+
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
+
+  const isValidConnection: IsValidConnection = useCallback(
+    (connection) => {
+      // we are using getNodes and getEdges helpers here
+      // to make sure we create isValidConnection function only once
+      const nodes = getNodes();
+      const edges = getEdges();
+      const target = nodes.find((node) => node.id === connection.target);
+      if (!target) {
+        return false;
+      }
+
+      const hasCycle = (node: Node, visited = new Set()) => {
+        if (visited.has(node.id)) return false;
+
+        visited.add(node.id);
+
+        for (const outgoer of getOutgoers(node, nodes, edges)) {
+          if (outgoer.id === connection.source) return true;
+          if (hasCycle(outgoer, visited)) return true;
+        }
+      };
+
+      if (target.id === connection.source) return false;
+      return !hasCycle(target);
+    },
+    [getNodes, getEdges],
+  );
 
   const updateNodeMutation = useMutation({
     mutationFn: (args: { schemaId: number; nodes: Node[] }) =>
@@ -64,6 +96,7 @@ function _Flow() {
       invalidates: "none",
     },
   });
+
   const updateEdgeMutation = useMutation({
     mutationFn: (args: { schemaId: number; edges: Edge[] }) =>
       SchemaUseCases.updateSchemaEdges(args.schemaId, args.edges),
@@ -127,6 +160,7 @@ function _Flow() {
           <>
             <ReactFlow
               deleteKeyCode="Delete"
+              isValidConnection={isValidConnection}
               zoomOnDoubleClick={false}
               onDoubleClick={ctx?.handleDoubleClick}
               nodes={nodes}
