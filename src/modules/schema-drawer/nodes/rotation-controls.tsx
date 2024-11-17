@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { type Node, type NodeProps, type Position, useReactFlow } from "@xyflow/react";
+import { type Node, type NodeProps, type Position, useReactFlow, useUpdateNodeInternals } from "@xyflow/react";
 import { CornerLeftDown, CornerRightDown } from "lucide-react";
 import { OrientationUtils } from "./orientation-utils";
 
@@ -13,12 +13,17 @@ export function RotationControls(
     position?: "near" | "far";
   },
 ) {
+  const updateNodeInternals = useUpdateNodeInternals();
   const { updateNodeData } = useReactFlow();
 
-  const onRotateRight = () =>
+  const onRotateRight = () => {
     updateNodeData(props.id, { orientation: OrientationUtils.rotate(props.data.orientation, 1) });
-  const onRotateLeft = () =>
+    updateNodeInternals(props.id);
+  };
+  const onRotateLeft = () => {
     updateNodeData(props.id, { orientation: OrientationUtils.rotate(props.data.orientation, -1) });
+    updateNodeInternals(props.id);
+  };
 
   return (
     <>
