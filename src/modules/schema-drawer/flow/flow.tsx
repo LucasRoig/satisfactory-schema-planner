@@ -20,6 +20,7 @@ import { SchemaUseCases } from "@/use-cases/schema";
 import { useDebounce } from "@/utils/use-debounce";
 import { useMutation } from "@tanstack/react-query";
 import { v4 as uuid } from "uuid";
+import { type FlowInfoMap, computeFlowInfo } from "../flow-calc/flow-calc";
 import { BuildingNode } from "../nodes/building-node";
 import { MergerNode } from "../nodes/merger-node";
 import { type NodeType, nodeFactory } from "../nodes/nodes-types";
@@ -53,10 +54,11 @@ export function Flow() {
 
 function _Flow() {
   const { focusedSchemaId } = useSchemaDrawerContext();
-  const { getNodes, getEdges } = useReactFlow();
+  const { getNodes, getEdges, addNodes: _addNodes } = useReactFlow();
 
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
+  const [flowInfoMap, setFlowInfoMap] = useState<FlowInfoMap>(new Map());
 
   const isValidConnection: IsValidConnection = useCallback(
     (connection) => {
@@ -117,6 +119,7 @@ function _Flow() {
       }
       setNodes(data.nodes);
       setEdges(data.edges);
+      setFlowInfoMap(computeFlowInfo(data.nodes, data.edges));
     },
   });
   const { addEdges, updateNodeData: _updateNodeData } = useReactFlow();
@@ -146,15 +149,24 @@ function _Flow() {
     [debouncedUpdateEdge, focusedSchemaId],
   );
 
+  const addNodes = useCallback(
+    (payload: Node | Node[]) => {
+      _addNodes(payload);
+      setFlowInfoMap(computeFlowInfo(getNodes(), getEdges()));
+    },
+    [_addNodes, getNodes, getEdges],
+  );
+
   const onConnect: OnConnect = useCallback(
     (params) => {
       addEdges([{ ...params, id: uuid(), animated: true }]);
+      setFlowInfoMap(computeFlowInfo(getNodes(), getEdges()));
     },
-    [addEdges],
+    [addEdges, getNodes, getEdges],
   );
 
   return (
-    <DoubleClickHandlerContextProvider>
+    <DoubleClickHandlerContextProvider addNodes={addNodes}>
       <doubleClickHandlerContext.Consumer>
         {(ctx) => (
           <>
@@ -170,7 +182,7 @@ function _Flow() {
               onConnect={onConnect}
               nodeTypes={nodeTypes}
             >
-              <ConfigPanel nodes={nodes} />
+              <ConfigPanel nodes={nodes} edges={edges} flowInfoMap={flowInfoMap} />
               <Background />
             </ReactFlow>
           </>
@@ -182,9 +194,12 @@ function _Flow() {
 
 const doubleClickHandlerContext = createContext<{ handleDoubleClick: MouseEventHandler } | undefined>(undefined);
 
-const DoubleClickHandlerContextProvider = ({ children }: { children: ReactElement }) => {
+const DoubleClickHandlerContextProvider = ({
+  children,
+  addNodes,
+}: { children: ReactElement; addNodes: (payload: Node | Node[]) => void }) => {
   const lastDoubleClickPosition = useRef<XYPosition>();
-  const { addNodes, screenToFlowPosition } = useReactFlow();
+  const { screenToFlowPosition } = useReactFlow();
 
   const [isNodePickerOpen, setIsNodePickerOpen] = useState(false);
   const insertNode = useCallback(
