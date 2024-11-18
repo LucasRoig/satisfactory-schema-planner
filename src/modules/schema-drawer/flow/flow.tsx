@@ -20,7 +20,9 @@ import { SchemaUseCases } from "@/use-cases/schema";
 import { useDebounce } from "@/utils/use-debounce";
 import { useMutation } from "@tanstack/react-query";
 import { v4 as uuid } from "uuid";
-import { type FlowInfoMap, computeFlowInfo } from "../flow-calc/flow-calc";
+import { EdgeWithFlow } from "../edges/edge-with-flow";
+import { computeFlowInfo } from "../flow-calc/flow-calc";
+import { FlowCalcContextProvider, useFlowCalcContext } from "../flow-calc/flow-calc-context";
 import { BuildingNode } from "../nodes/building-node";
 import { MergerNode } from "../nodes/merger-node";
 import { type NodeType, nodeFactory } from "../nodes/nodes-types";
@@ -44,10 +46,16 @@ const nodeTypes = {
   building: BuildingNode,
 };
 
+const edgeTypes = {
+  edgeWithFlow: EdgeWithFlow,
+};
+
 export function Flow() {
   return (
     <ReactFlowProvider>
-      <_Flow />
+      <FlowCalcContextProvider>
+        <_Flow />
+      </FlowCalcContextProvider>
     </ReactFlowProvider>
   );
 }
@@ -58,8 +66,7 @@ function _Flow() {
 
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
-  const [flowInfoMap, setFlowInfoMap] = useState<FlowInfoMap>(new Map());
-
+  const { flowInfoMap, setFlowInfoMap } = useFlowCalcContext();
   const isValidConnection: IsValidConnection = useCallback(
     (connection) => {
       // we are using getNodes and getEdges helpers here
@@ -154,15 +161,15 @@ function _Flow() {
       _addNodes(payload);
       setFlowInfoMap(computeFlowInfo(getNodes(), getEdges()));
     },
-    [_addNodes, getNodes, getEdges],
+    [_addNodes, getNodes, getEdges, setFlowInfoMap],
   );
 
   const onConnect: OnConnect = useCallback(
     (params) => {
-      addEdges([{ ...params, id: uuid(), animated: true }]);
+      addEdges([{ ...params, id: uuid(), animated: true, type: "edgeWithFlow" }]);
       setFlowInfoMap(computeFlowInfo(getNodes(), getEdges()));
     },
-    [addEdges, getNodes, getEdges],
+    [addEdges, getNodes, getEdges, setFlowInfoMap],
   );
 
   return (
@@ -181,6 +188,7 @@ function _Flow() {
               onEdgesChange={onEdgesChange}
               onConnect={onConnect}
               nodeTypes={nodeTypes}
+              edgeTypes={edgeTypes}
             >
               <ConfigPanel nodes={nodes} edges={edges} flowInfoMap={flowInfoMap} />
               <Background />
