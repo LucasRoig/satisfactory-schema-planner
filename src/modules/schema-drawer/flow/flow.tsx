@@ -16,12 +16,13 @@ import {
 } from "@xyflow/react";
 import { type MouseEventHandler, type ReactElement, createContext, useCallback, useRef, useState } from "react";
 import "@xyflow/react/dist/style.css";
+import { useProfileContext } from "@/modules/profile/profile-context";
 import { SchemaUseCases } from "@/use-cases/schema";
 import { useDebounce } from "@/utils/use-debounce";
 import { useMutation } from "@tanstack/react-query";
 import { v4 as uuid } from "uuid";
 import { EdgeWithFlow } from "../edges/edge-with-flow";
-import { computeFlowInfo } from "../flow-calc/flow-calc";
+import { FlowCalc } from "../flow-calc/flow-calc";
 import { FlowCalcContextProvider, useFlowCalcContext } from "../flow-calc/flow-calc-context";
 import { BuildingNode } from "../nodes/building-node";
 import { MergerNode } from "../nodes/merger-node";
@@ -62,6 +63,7 @@ export function Flow() {
 
 function _Flow() {
   const { focusedSchemaId } = useSchemaDrawerContext();
+  const { recipes } = useProfileContext();
   const { getNodes, getEdges, addNodes: _addNodes } = useReactFlow();
 
   const [nodes, setNodes] = useState<Node[]>([]);
@@ -126,7 +128,8 @@ function _Flow() {
       }
       setNodes(data.nodes);
       setEdges(data.edges);
-      setFlowInfoMap(computeFlowInfo(data.nodes, data.edges));
+      const flowCompute = new FlowCalc(data.nodes, data.edges, recipes);
+      setFlowInfoMap(flowCompute.computeFlowInfo());
     },
   });
   const { addEdges, updateNodeData: _updateNodeData } = useReactFlow();
@@ -159,17 +162,19 @@ function _Flow() {
   const addNodes = useCallback(
     (payload: Node | Node[]) => {
       _addNodes(payload);
-      setFlowInfoMap(computeFlowInfo(getNodes(), getEdges()));
+      const flowCompute = new FlowCalc(getNodes(), getEdges(), recipes);
+      setFlowInfoMap(flowCompute.computeFlowInfo());
     },
-    [_addNodes, getNodes, getEdges, setFlowInfoMap],
+    [_addNodes, getNodes, getEdges, setFlowInfoMap, recipes],
   );
 
   const onConnect: OnConnect = useCallback(
     (params) => {
       addEdges([{ ...params, id: uuid(), animated: true, type: "edgeWithFlow" }]);
-      setFlowInfoMap(computeFlowInfo(getNodes(), getEdges()));
+      const flowCompute = new FlowCalc(getNodes(), getEdges(), recipes);
+      setFlowInfoMap(flowCompute.computeFlowInfo());
     },
-    [addEdges, getNodes, getEdges, setFlowInfoMap],
+    [addEdges, getNodes, getEdges, setFlowInfoMap, recipes],
   );
 
   return (
