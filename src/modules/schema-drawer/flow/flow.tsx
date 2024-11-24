@@ -118,6 +118,10 @@ function _Flow() {
               nodeTypes={nodeTypes}
               edgeTypes={edgeTypes}
               id="reactflow"
+              selectionOnDrag={true}
+              panOnScroll={true}
+              zoomOnPinch={true}
+              panOnDrag={false}
             >
               <ConfigPanel nodes={nodes} edges={edges} flowInfoMap={flowInfoMap} updateFlowCalc={updateFlowCalc} />
               <Background />
