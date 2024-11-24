@@ -169,7 +169,6 @@ export class FlowCalc {
     if (target === undefined) {
       // nothing to do
     } else if (isBuildingNode(target) && target.data.recipeId !== undefined) {
-      console.log("target is building");
       const recipe = this.recipesMap.get(target.data.recipeId);
       if (recipe === undefined) {
         throw new Error(`Recipe ${target.data.recipeId} not found`);
@@ -184,7 +183,6 @@ export class FlowCalc {
       if (item === undefined) {
         throw new Error(`Item ${outputIndex} not found in recipe ${target.data.recipeId}`);
       }
-      console.log("item", item);
       if (flowInfo.kind !== "edgeFlow") {
         throw new Error("Edge has a building target but no input");
       }
@@ -196,7 +194,6 @@ export class FlowCalc {
           itemId: item.itemId,
         },
       };
-      console.log("flowInfo", flowInfo);
     }
     this.flowInfoMap.set(edge.id, flowInfo);
     return flowInfo;

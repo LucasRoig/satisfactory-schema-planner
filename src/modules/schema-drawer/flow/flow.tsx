@@ -117,6 +117,7 @@ function _Flow() {
               onDelete={onDelete}
               nodeTypes={nodeTypes}
               edgeTypes={edgeTypes}
+              id="reactflow"
             >
               <ConfigPanel nodes={nodes} edges={edges} flowInfoMap={flowInfoMap} updateFlowCalc={updateFlowCalc} />
               <Background />
@@ -149,6 +150,12 @@ const DoubleClickHandlerContextProvider = ({
   );
   const handleDoubleClick: MouseEventHandler = useCallback(
     (e) => {
+      const t = e.target as HTMLElement;
+      if (!t.classList.contains("react-flow__pane")) {
+        e.stopPropagation();
+        e.preventDefault();
+        return;
+      }
       const { x, y } = screenToFlowPosition({ x: e.clientX, y: e.clientY });
       lastDoubleClickPosition.current = { x, y };
       setIsNodePickerOpen(true);
