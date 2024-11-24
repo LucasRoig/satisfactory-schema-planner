@@ -7,6 +7,8 @@ export type NodeType = "source" | "splitter" | "merger" | "building";
 export const isSourceNode = (node: Node): node is SourceNode => node.type === "source";
 export const isBuildingNode = (node: Node): node is BuildingNode => node.type === "building";
 export const isMergerNode = (node: Node): node is MergerNode => node.type === "merger";
+export const isSplitterNode = (node: Node): node is SplitterNode => node.type === "splitter";
+
 export type SourceNode = Node<{
   orientation: Position;
   itemId: number | undefined;

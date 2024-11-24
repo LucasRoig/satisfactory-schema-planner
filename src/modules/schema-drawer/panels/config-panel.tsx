@@ -1,11 +1,12 @@
 import { type Edge, type Node, Panel } from "@xyflow/react";
 import type { ReactNode } from "react";
 import type { FlowInfoMap } from "../flow-calc/flow-calc";
-import { isBuildingNode, isMergerNode, isSourceNode } from "../nodes/nodes-types";
+import { isBuildingNode, isMergerNode, isSourceNode, isSplitterNode } from "../nodes/nodes-types";
 import { BuildingConfigPanel } from "./building-config-panel";
 import { EdgePanel } from "./edge-panel";
 import { MergerConfigPanel } from "./merger-panel";
 import { SourceConfigPanel } from "./source-config-panel";
+import { SplitterPanel } from "./splitter-panel";
 
 export function ConfigPanel(props: {
   nodes: Node[];
@@ -21,12 +22,12 @@ export function ConfigPanel(props: {
     const selectedNode = selectedNodes[0];
     if (isSourceNode(selectedNode)) {
       component = <SourceConfigPanel node={selectedNode} updateFlowCalc={props.updateFlowCalc} />;
-    }
-    if (isBuildingNode(selectedNode)) {
+    } else if (isBuildingNode(selectedNode)) {
       component = <BuildingConfigPanel node={selectedNode} updateFlowCalc={props.updateFlowCalc} />;
-    }
-    if (isMergerNode(selectedNode)) {
+    } else if (isMergerNode(selectedNode)) {
       component = <MergerConfigPanel node={selectedNode} flowInfoMap={props.flowInfoMap} />;
+    } else if (isSplitterNode(selectedNode)) {
+      component = <SplitterPanel node={selectedNode} flowInfoMap={props.flowInfoMap} />;
     }
   } else if (selectedEdges.length === 1) {
     const selectedEdge = selectedEdges[0];

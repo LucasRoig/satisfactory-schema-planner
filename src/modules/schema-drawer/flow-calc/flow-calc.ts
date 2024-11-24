@@ -1,6 +1,6 @@
 import type { FetchRecipesResults } from "@/modules/settings/queries/use-recipes-for-profile";
 import type { Edge, Node } from "@xyflow/react";
-import { isBuildingNode, isMergerNode, isSourceNode } from "../nodes/nodes-types";
+import { isBuildingNode, isMergerNode, isSourceNode, isSplitterNode } from "../nodes/nodes-types";
 
 type EdgeFlowInfo = {
   kind: "edgeFlow";
@@ -51,6 +51,8 @@ type MergerFlowInfo = {
 
 type SplitterFlowInfo = {
   kind: "splitterFlow";
+  isError: boolean;
+  message: string | undefined;
   input:
     | {
         quantity: number;
@@ -177,6 +179,40 @@ export class FlowCalc {
           },
         };
       }
+    } else if (isSplitterNode(source)) {
+      const handleId = edge.sourceHandle;
+      const match = handleId?.match(/output(\d+)/);
+      if (match === null || match === undefined) {
+        throw new Error(`Invalid handle id: ${handleId}`);
+      }
+      const handleIndex = Number.parseInt(match[1]);
+      const splitterFlowInfo = this.computeNodeInfo(source);
+      if (splitterFlowInfo.kind === "splitterFlow") {
+        const splitterOutput =
+          handleIndex === 0
+            ? splitterFlowInfo.outputs.output0
+            : handleIndex === 1
+              ? splitterFlowInfo.outputs.output1
+              : splitterFlowInfo.outputs.output2;
+        if (splitterOutput === undefined) {
+          flowInfo = { kind: "noInfo" };
+        } else {
+          flowInfo = {
+            kind: "edgeFlow",
+            hasError: false,
+            hasWarning: false,
+            message: undefined,
+            input: {
+              quantity: splitterOutput.quantity,
+              itemId: splitterOutput.itemId,
+            },
+            output: {
+              quantity: splitterOutput.quantity,
+              itemId: splitterOutput.itemId,
+            },
+          };
+        }
+      }
     } else {
       flowInfo = { kind: "noInfo" };
     }
@@ -228,6 +264,12 @@ export class FlowCalc {
       } else if (flowInfo.input.quantity > flowInfo.output.quantity) {
         flowInfo.hasWarning = true;
         flowInfo.message = "Input quantity is greater than output quantity";
+      } else if (flowInfo.input.quantity < 0) {
+        flowInfo.hasError = true;
+        flowInfo.message = "Input quantity is negative";
+      } else if (flowInfo.output.quantity < 0) {
+        flowInfo.hasError = true;
+        flowInfo.message = "Output quantity is negative";
       }
     }
     this.flowInfoMap.set(edge.id, flowInfo);
@@ -273,6 +315,94 @@ export class FlowCalc {
             quantity: definedInputs.reduce((acc, cur) => acc + cur.quantity, 0),
             itemId: definedInputs[0].itemId,
           };
+        }
+      }
+    } else if (isSplitterNode(node)) {
+      const inputEdges = this.edges
+        .filter((e) => e.target === node.id)
+        .map((e) => this.computeEdgeInfo(e))
+        .filter((e) => e !== undefined);
+
+      if (inputEdges.length > 0 && inputEdges[0].kind === "edgeFlow") {
+        const input = inputEdges[0].output;
+        flowInfo = {
+          isError: false,
+          message: undefined,
+          kind: "splitterFlow",
+          input,
+          outputs: {
+            output0: undefined,
+            output1: undefined,
+            output2: undefined,
+          },
+        };
+        const outputs = this.edges.filter((e) => e.source === node.id);
+        for (const output of outputs) {
+          const handleId = output.sourceHandle;
+          const match = handleId?.match(/output(\d+)/);
+          const outputIndex = match ? Number.parseInt(match[1]) : undefined;
+          const outputNode = this.nodes.find((n) => n.id === output.target);
+          let outputQuantity = Number.NaN;
+          if (outputNode && isBuildingNode(outputNode) && outputNode.data.recipeId !== undefined) {
+            const recipe = this.recipesMap.get(outputNode.data.recipeId);
+            if (recipe === undefined) {
+              throw new Error(`Recipe ${outputNode.data.recipeId} not found`);
+            }
+            const inputHandleId = output.targetHandle;
+            const match = inputHandleId?.match(/[A-Za-z0-9\-]+-input(\d+)/);
+            if (match === null || match === undefined) {
+              throw new Error(`Invalid handle id: ${inputHandleId}`);
+            }
+            const inputIndex = Number.parseInt(match[1]);
+            const item = recipe.inputs[inputIndex];
+            if (item === undefined) {
+              throw new Error(`Item ${inputIndex} not found in recipe ${outputNode.data.recipeId}`);
+            }
+            outputQuantity = item.quantity;
+          }
+          if (outputIndex === undefined) {
+            throw new Error(`Invalid handle id: ${handleId}`);
+          }
+          if (outputIndex === 0) {
+            flowInfo.outputs.output0 = {
+              quantity: outputQuantity,
+              itemId: input.itemId,
+            };
+          } else if (outputIndex === 1) {
+            flowInfo.outputs.output1 = {
+              quantity: outputQuantity,
+              itemId: input.itemId,
+            };
+          } else if (outputIndex === 2) {
+            flowInfo.outputs.output2 = {
+              quantity: outputQuantity,
+              itemId: input.itemId,
+            };
+          } else {
+            throw new Error(`Invalid output index: ${outputIndex}`);
+          }
+        }
+        let remainingQuantity = input.quantity;
+        const flowOutputsInfo = [flowInfo.outputs.output0, flowInfo.outputs.output1, flowInfo.outputs.output2].filter(
+          (e) => e !== undefined,
+        );
+        for (const output of flowOutputsInfo) {
+          if (!Number.isNaN(output.quantity)) {
+            remainingQuantity -= output.quantity;
+          }
+        }
+        const outputsToCompute = flowOutputsInfo.filter((e) => Number.isNaN(e.quantity));
+        const quantityPerOutput = remainingQuantity / outputsToCompute.length;
+        for (const output of outputsToCompute) {
+          output.quantity = quantityPerOutput;
+          remainingQuantity -= quantityPerOutput;
+        }
+        if (Math.round(remainingQuantity) < 0) {
+          flowInfo.isError = true;
+          flowInfo.message = "Not enough quantity";
+        } else if (Math.round(remainingQuantity) > 0) {
+          flowInfo.isError = true;
+          flowInfo.message = "Too much quantity";
         }
       }
     } else {
