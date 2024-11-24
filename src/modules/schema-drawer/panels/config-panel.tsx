@@ -23,7 +23,7 @@ export function ConfigPanel(props: {
       component = <SourceConfigPanel node={selectedNode} updateFlowCalc={props.updateFlowCalc} />;
     }
     if (isBuildingNode(selectedNode)) {
-      component = <BuildingConfigPanel node={selectedNode} />;
+      component = <BuildingConfigPanel node={selectedNode} updateFlowCalc={props.updateFlowCalc} />;
     }
     if (isMergerNode(selectedNode)) {
       component = <MergerConfigPanel node={selectedNode} flowInfoMap={props.flowInfoMap} />;
