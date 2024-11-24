@@ -97,6 +97,7 @@ export class FlowCalc {
     }
     let flowInfo: NoInfo | EdgeFlowInfo = { kind: "noInfo" };
     const source = this.nodes.find((node) => node.id === edge.source);
+    const target = this.nodes.find((node) => node.id === edge.target);
     if (source === undefined) {
       flowInfo = { kind: "noInfo" };
     } else if (isSourceNode(source)) {
@@ -165,6 +166,38 @@ export class FlowCalc {
     } else {
       flowInfo = { kind: "noInfo" };
     }
+    if (target === undefined) {
+      // nothing to do
+    } else if (isBuildingNode(target) && target.data.recipeId !== undefined) {
+      console.log("target is building");
+      const recipe = this.recipesMap.get(target.data.recipeId);
+      if (recipe === undefined) {
+        throw new Error(`Recipe ${target.data.recipeId} not found`);
+      }
+      const handleId = edge.targetHandle;
+      const match = handleId?.match(/[A-Za-z0-9\-]+-input(\d+)/);
+      if (match === null || match === undefined) {
+        throw new Error(`Invalid handle id: ${handleId}`);
+      }
+      const outputIndex = Number.parseInt(match[1]);
+      const item = recipe.inputs[outputIndex];
+      if (item === undefined) {
+        throw new Error(`Item ${outputIndex} not found in recipe ${target.data.recipeId}`);
+      }
+      console.log("item", item);
+      if (flowInfo.kind !== "edgeFlow") {
+        throw new Error("Edge has a building target but no input");
+      }
+      flowInfo = {
+        kind: "edgeFlow",
+        input: flowInfo.input,
+        output: {
+          quantity: item.quantity,
+          itemId: item.itemId,
+        },
+      };
+      console.log("flowInfo", flowInfo);
+    }
     this.flowInfoMap.set(edge.id, flowInfo);
     return flowInfo;
   }
@@ -215,56 +248,3 @@ export class FlowCalc {
     return this.flowInfoMap;
   }
 }
-
-// export function computeFlowInfo(nodes: Node[], edges: Edge[]): FlowInfoMap {
-//   const flowInfoMap = new Map<string, FlowInfo>();
-//   for (const edge of edges) {
-//     const source = nodes.find((node) => node.id === edge.source);
-//     if (source === undefined) {
-//       flowInfoMap.set(edge.id, { kind: "noInfo" });
-//     } else if (isSourceNode(source)) {
-//       if (source.data.itemId === undefined) {
-//         flowInfoMap.set(edge.id, { kind: "noInfo" });
-//       } else {
-//         flowInfoMap.set(edge.id, {
-//           kind: "edgeFlow",
-//           input: {
-//             quantity: source.data.quantity,
-//             itemId: source.data.itemId,
-//           },
-//           output: {
-//             quantity: source.data.quantity,
-//             itemId: source.data.itemId,
-//           },
-//         });
-//       }
-//     } else {
-//       flowInfoMap.set(edge.id, { kind: "noInfo" });
-//     }
-//   }
-//   for (const node of nodes) {
-//     if (isMergerNode(node)) {
-//       const inputsEdges = edges.filter((e) => e.target === node.id).map(e => flowInfoMap.get(e.id)).filter(e => e !== undefined);
-//       const flowInfo: MergerFlowInfo = {
-//         kind: "mergerFlow",
-//         inputs: {
-//           input0: inputsEdges[0]?.kind === "edgeFlow" ? inputsEdges[0].input : undefined,
-//           input1: inputsEdges[1]?.kind === "edgeFlow" ? inputsEdges[1].input : undefined,
-//           input2: inputsEdges[2]?.kind === "edgeFlow" ? inputsEdges[2].input : undefined,
-//         },
-//         output: undefined,
-//       }
-//       const definedInputs = [flowInfo.inputs.input0, flowInfo.inputs.input1, flowInfo.inputs.input2].filter(e => e !== undefined);
-//       if (definedInputs.length > 0) {
-//         flowInfo.output = {
-//           quantity: definedInputs.reduce((acc, cur) => acc + cur.quantity, 0),
-//           itemId: definedInputs[0].itemId,
-//         }
-//       }
-//       flowInfoMap.set(node.id, flowInfo);
-//     } else {
-//       flowInfoMap.set(node.id, { kind: "noInfo" });
-//     }
-//   }
-//   return flowInfoMap;
-// }

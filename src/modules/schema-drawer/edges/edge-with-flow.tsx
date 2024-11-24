@@ -16,15 +16,35 @@ export function EdgeWithFlow(props: EdgeProps) {
 
   const flowInfo = flowInfoMap.get(props.id);
   let label = "";
+  let hasError = false;
+  let hasWarning = false;
+
   if (flowInfo && flowInfo.kind === "edgeFlow") {
     const inputItem = items.get(flowInfo.input.itemId);
-    const quantity = flowInfo.input.quantity;
-    label = `${quantity} ${inputItem?.name}`;
+    const inputQuantity = flowInfo.input.quantity;
+    const outputItem = items.get(flowInfo.output.itemId);
+    const outputQuantity = flowInfo.output.quantity;
+    if (inputItem !== outputItem) {
+      hasError = true;
+    }
+    if (inputQuantity !== outputQuantity) {
+      hasWarning = true;
+    }
+    label = `${outputQuantity} ${outputItem?.name}`;
   }
 
   return (
     <>
-      <BaseEdge path={edgePath} markerEnd={props.markerEnd} markerStart={props.markerStart} />
+      <BaseEdge
+        path={edgePath}
+        markerEnd={props.markerEnd}
+        markerStart={props.markerStart}
+        style={{
+          stroke: hasError ? "hsl(0 84.2% 60.2%)" : hasWarning ? "hsl(47.9 95.8% 53.1%)" : undefined,
+          strokeWidth: hasError ? 3 : hasWarning ? 2 : 1,
+        }}
+        className={"color-red-800"}
+      />
       <EdgeLabelRenderer>
         <div
           style={{
