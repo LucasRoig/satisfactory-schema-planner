@@ -20,16 +20,10 @@ export function EdgeWithFlow(props: EdgeProps) {
   let hasWarning = false;
 
   if (flowInfo && flowInfo.kind === "edgeFlow") {
-    const inputItem = items.get(flowInfo.input.itemId);
-    const inputQuantity = flowInfo.input.quantity;
+    hasError = flowInfo.hasError;
+    hasWarning = flowInfo.hasWarning;
     const outputItem = items.get(flowInfo.output.itemId);
     const outputQuantity = flowInfo.output.quantity;
-    if (inputItem !== outputItem) {
-      hasError = true;
-    }
-    if (inputQuantity !== outputQuantity) {
-      hasWarning = true;
-    }
     label = `${outputQuantity} ${outputItem?.name}`;
   }
 

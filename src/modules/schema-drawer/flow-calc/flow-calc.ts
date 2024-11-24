@@ -4,6 +4,9 @@ import { isBuildingNode, isMergerNode, isSourceNode } from "../nodes/nodes-types
 
 type EdgeFlowInfo = {
   kind: "edgeFlow";
+  hasError: boolean;
+  hasWarning: boolean;
+  message: string | undefined;
   input: {
     quantity: number;
     itemId: number;
@@ -106,6 +109,9 @@ export class FlowCalc {
       } else {
         flowInfo = {
           kind: "edgeFlow",
+          hasError: false,
+          hasWarning: false,
+          message: undefined,
           input: {
             quantity: source.data.quantity,
             itemId: source.data.itemId,
@@ -121,6 +127,9 @@ export class FlowCalc {
       if (mergerFlowInfo.kind === "mergerFlow" && mergerFlowInfo.output !== undefined) {
         flowInfo = {
           kind: "edgeFlow",
+          hasError: false,
+          hasWarning: false,
+          message: undefined,
           input: {
             quantity: mergerFlowInfo.output.quantity,
             itemId: mergerFlowInfo.output.itemId,
@@ -153,6 +162,9 @@ export class FlowCalc {
         }
         flowInfo = {
           kind: "edgeFlow",
+          hasError: false,
+          hasWarning: false,
+          message: undefined,
           input: {
             quantity: item.quantity,
             itemId: item.itemId,
@@ -187,6 +199,9 @@ export class FlowCalc {
         throw new Error("Edge has a building target but no input");
       }
       flowInfo = {
+        hasError: false,
+        hasWarning: false,
+        message: undefined,
         kind: "edgeFlow",
         input: flowInfo.input,
         output: {
@@ -194,6 +209,18 @@ export class FlowCalc {
           itemId: item.itemId,
         },
       };
+    }
+    if (flowInfo.kind === "edgeFlow") {
+      if (flowInfo.output.itemId !== flowInfo.input.itemId) {
+        flowInfo.hasError = true;
+        flowInfo.message = "Input and output items are different";
+      } else if (flowInfo.input.quantity < flowInfo.output.quantity) {
+        flowInfo.hasWarning = true;
+        flowInfo.message = "Input quantity is less than output quantity";
+      } else if (flowInfo.input.quantity > flowInfo.output.quantity) {
+        flowInfo.hasWarning = true;
+        flowInfo.message = "Input quantity is greater than output quantity";
+      }
     }
     this.flowInfoMap.set(edge.id, flowInfo);
     return flowInfo;

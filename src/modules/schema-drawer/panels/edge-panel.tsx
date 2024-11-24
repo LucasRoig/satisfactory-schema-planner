@@ -16,6 +16,7 @@ export function EdgePanel(props: { flowInfoMap: FlowInfoMap; edge: Edge }) {
     const outputItem = items.get(flowInfo.output.itemId);
     component = (
       <>
+        {flowInfo.message ? <div className="text-red-800">{flowInfo.message}</div> : null}
         <PseudoFormItem>
           <PseudoFormLabel>Input</PseudoFormLabel>
           <div>
