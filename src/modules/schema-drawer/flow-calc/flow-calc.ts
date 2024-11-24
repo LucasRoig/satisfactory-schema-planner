@@ -19,6 +19,8 @@ type EdgeFlowInfo = {
 
 type MergerFlowInfo = {
   kind: "mergerFlow";
+  hasError: boolean;
+  message: string | undefined;
   inputs: {
     input0:
       | {
@@ -195,15 +197,21 @@ export class FlowCalc {
       if (item === undefined) {
         throw new Error(`Item ${outputIndex} not found in recipe ${target.data.recipeId}`);
       }
-      if (flowInfo.kind !== "edgeFlow") {
-        throw new Error("Edge has a building target but no input");
-      }
+      // if (flowInfo.kind !== "edgeFlow") {
+      //   throw new Error("Edge has a building target but no input");
+      // }
       flowInfo = {
         hasError: false,
         hasWarning: false,
         message: undefined,
         kind: "edgeFlow",
-        input: flowInfo.input,
+        input:
+          flowInfo.kind === "edgeFlow"
+            ? flowInfo.input
+            : {
+                quantity: 0,
+                itemId: item.itemId,
+              },
         output: {
           quantity: item.quantity,
           itemId: item.itemId,
@@ -239,6 +247,8 @@ export class FlowCalc {
         .filter((e) => e !== undefined);
       flowInfo = {
         kind: "mergerFlow",
+        hasError: false,
+        message: undefined,
         inputs: {
           input0: inputsEdges[0]?.kind === "edgeFlow" ? inputsEdges[0].input : undefined,
           input1: inputsEdges[1]?.kind === "edgeFlow" ? inputsEdges[1].input : undefined,
@@ -250,10 +260,20 @@ export class FlowCalc {
         (e) => e !== undefined,
       );
       if (definedInputs.length > 0) {
-        flowInfo.output = {
-          quantity: definedInputs.reduce((acc, cur) => acc + cur.quantity, 0),
-          itemId: definedInputs[0].itemId,
-        };
+        const inputItemType = definedInputs[0].itemId;
+        for (let i = 1; i < definedInputs.length; i++) {
+          if (definedInputs[i].itemId !== inputItemType) {
+            flowInfo.hasError = true;
+            flowInfo.message = "Inputs are not of the same type";
+            break;
+          }
+        }
+        if (!flowInfo.hasError) {
+          flowInfo.output = {
+            quantity: definedInputs.reduce((acc, cur) => acc + cur.quantity, 0),
+            itemId: definedInputs[0].itemId,
+          };
+        }
       }
     } else {
       flowInfo = { kind: "noInfo" };

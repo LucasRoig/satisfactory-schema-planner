@@ -17,6 +17,7 @@ export function MergerConfigPanel(props: { flowInfoMap: FlowInfoMap; node: Merge
     const outputItem = flowInfo.output ? items.get(flowInfo.output.itemId) : undefined;
     component = (
       <div>
+        {flowInfo.message ? <div className="text-red-800">{flowInfo.message}</div> : null}
         <div>Inputs</div>
         <div>
           i0: {item0?.name} {flowInfo.inputs.input0?.quantity}

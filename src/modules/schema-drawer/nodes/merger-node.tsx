@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import type { NodeProps } from "@xyflow/react";
+import { useFlowCalcContext } from "../flow-calc/flow-calc-context";
 import { BaseNode } from "./base-node";
 import { CustomHandle } from "./custom-handle";
 import type { MergerNode as MergerNodeType } from "./nodes-types";
@@ -8,11 +9,19 @@ import { RotationControls } from "./rotation-controls";
 
 export function MergerNode(props: NodeProps<MergerNodeType>) {
   const orientationIndex = OrientationUtils.getIndex(props.data.orientation);
+  const { flowInfoMap } = useFlowCalcContext();
+  const flowInfo = flowInfoMap.get(props.id);
+  let hasError = false;
+
+  if (flowInfo !== undefined && flowInfo.kind === "mergerFlow") {
+    hasError = flowInfo.hasError;
+  }
+
   return (
     <BaseNode
       className={cn(
         "aspect-square rounded-sm flex flex-col items-center justify-center relative",
-        // props.selected && "border-red-800"
+        hasError && "border-red-600 border-[2px]",
       )}
       selected={props.selected}
     >
