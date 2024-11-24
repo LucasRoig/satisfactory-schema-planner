@@ -27,7 +27,7 @@ export function BuildingNode(props: NodeProps<BuildingNodeType>) {
                   throw new Error(`Item ${r.itemId} not found`);
                 }
                 // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-                return <Input key={i} nodeId={props.id} id={`input${i}`} label={item.name} />;
+                return <Input key={i} nodeId={props.id} id={`input${i}`} label={`${r.quantity} ${item.name}`} />;
               })}
             </div>
             <div className="flex flex-col">
@@ -38,7 +38,7 @@ export function BuildingNode(props: NodeProps<BuildingNodeType>) {
                   throw new Error(`Item ${r.itemId} not found`);
                 }
                 // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-                return <Output key={i} nodeId={props.id} id={`output${i}`} label={item.name} />;
+                return <Output key={i} nodeId={props.id} id={`output${i}`} label={`${r.quantity} ${item.name}`} />;
               })}
             </div>
           </>
