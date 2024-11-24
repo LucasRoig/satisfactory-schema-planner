@@ -1,29 +1,17 @@
 import {
   Background,
-  type Edge,
   type IsValidConnection,
   type Node,
-  type OnConnect,
-  type OnEdgesChange,
-  type OnNodesChange,
   ReactFlow,
   ReactFlowProvider,
   type XYPosition,
-  applyEdgeChanges,
-  applyNodeChanges,
   getOutgoers,
   useReactFlow,
 } from "@xyflow/react";
 import { type MouseEventHandler, type ReactElement, createContext, useCallback, useRef, useState } from "react";
 import "@xyflow/react/dist/style.css";
-import { useProfileContext } from "@/modules/profile/profile-context";
-import { SchemaUseCases } from "@/use-cases/schema";
-import { useDebounce } from "@/utils/use-debounce";
-import { useMutation } from "@tanstack/react-query";
-import { v4 as uuid } from "uuid";
 import { EdgeWithFlow } from "../edges/edge-with-flow";
-import { FlowCalc } from "../flow-calc/flow-calc";
-import { FlowCalcContextProvider, useFlowCalcContext } from "../flow-calc/flow-calc-context";
+import { FlowCalcContextProvider } from "../flow-calc/flow-calc-context";
 import { BuildingNode } from "../nodes/building-node";
 import { MergerNode } from "../nodes/merger-node";
 import { type NodeType, nodeFactory } from "../nodes/nodes-types";
@@ -33,6 +21,7 @@ import { ConfigPanel } from "../panels/config-panel";
 import { useFetchSchema } from "../queries/use-fetch-schema";
 import { useSchemaDrawerContext } from "../schema-drawer-context";
 import { NodeCommandPicker } from "./node-command-picker";
+import { useFlowState } from "./use-flow-state";
 
 // const initialNodes = [
 //   { id: "1", position: { x: 0, y: 0 }, data: { label: "1" } },
@@ -63,12 +52,11 @@ export function Flow() {
 
 function _Flow() {
   const { focusedSchemaId } = useSchemaDrawerContext();
-  const { recipes } = useProfileContext();
-  const { getNodes, getEdges, addNodes: _addNodes } = useReactFlow();
+  const { getNodes, getEdges } = useReactFlow();
 
-  const [nodes, setNodes] = useState<Node[]>([]);
-  const [edges, setEdges] = useState<Edge[]>([]);
-  const { flowInfoMap, setFlowInfoMap } = useFlowCalcContext();
+  const { nodes, edges, flowInfoMap, setSchema, onNodesChange, onEdgesChange, addNodes, onConnect, onDelete } =
+    useFlowState();
+
   const isValidConnection: IsValidConnection = useCallback(
     (connection) => {
       // we are using getNodes and getEdges helpers here
@@ -97,85 +85,9 @@ function _Flow() {
     [getNodes, getEdges],
   );
 
-  const updateNodeMutation = useMutation({
-    mutationFn: (args: { schemaId: number; nodes: Node[] }) =>
-      SchemaUseCases.updateSchemaNodes(args.schemaId, args.nodes),
-    onSuccess: () => {
-      console.info("saved nodes");
-    },
-    meta: {
-      invalidates: "none",
-    },
-  });
-
-  const updateEdgeMutation = useMutation({
-    mutationFn: (args: { schemaId: number; edges: Edge[] }) =>
-      SchemaUseCases.updateSchemaEdges(args.schemaId, args.edges),
-    onSuccess: () => {
-      console.info("saved edges");
-    },
-    meta: {
-      invalidates: "none",
-    },
-  });
-  const debouncedUpdateNode = useDebounce(updateNodeMutation.mutate, 5000);
-  const debouncedUpdateEdge = useDebounce(updateEdgeMutation.mutate, 5000);
-
   const { data: _data } = useFetchSchema(focusedSchemaId, {
-    onSuccess: (data) => {
-      if (data === undefined) {
-        throw new Error("Schema not found");
-      }
-      setNodes(data.nodes);
-      setEdges(data.edges);
-      const flowCompute = new FlowCalc(data.nodes, data.edges, recipes);
-      setFlowInfoMap(flowCompute.computeFlowInfo());
-    },
+    onSuccess: setSchema,
   });
-  const { addEdges, updateNodeData: _updateNodeData } = useReactFlow();
-
-  const onNodesChange: OnNodesChange = useCallback(
-    (changes) => {
-      setNodes((nds) => {
-        const newNodes = applyNodeChanges(changes, nds);
-        if (focusedSchemaId !== undefined) {
-          debouncedUpdateNode({ schemaId: focusedSchemaId, nodes: newNodes });
-        }
-        return newNodes;
-      });
-    },
-    [debouncedUpdateNode, focusedSchemaId],
-  );
-
-  const onEdgesChange: OnEdgesChange = useCallback(
-    (changes) =>
-      setEdges((eds) => {
-        const newEdges = applyEdgeChanges(changes, eds);
-        if (focusedSchemaId !== undefined) {
-          debouncedUpdateEdge({ schemaId: focusedSchemaId, edges: newEdges });
-        }
-        return newEdges;
-      }),
-    [debouncedUpdateEdge, focusedSchemaId],
-  );
-
-  const addNodes = useCallback(
-    (payload: Node | Node[]) => {
-      _addNodes(payload);
-      const flowCompute = new FlowCalc(getNodes(), getEdges(), recipes);
-      setFlowInfoMap(flowCompute.computeFlowInfo());
-    },
-    [_addNodes, getNodes, getEdges, setFlowInfoMap, recipes],
-  );
-
-  const onConnect: OnConnect = useCallback(
-    (params) => {
-      addEdges([{ ...params, id: uuid(), animated: true, type: "edgeWithFlow" }]);
-      const flowCompute = new FlowCalc(getNodes(), getEdges(), recipes);
-      setFlowInfoMap(flowCompute.computeFlowInfo());
-    },
-    [addEdges, getNodes, getEdges, setFlowInfoMap, recipes],
-  );
 
   return (
     <DoubleClickHandlerContextProvider addNodes={addNodes}>
@@ -192,6 +104,7 @@ function _Flow() {
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
               onConnect={onConnect}
+              onDelete={onDelete}
               nodeTypes={nodeTypes}
               edgeTypes={edgeTypes}
             >

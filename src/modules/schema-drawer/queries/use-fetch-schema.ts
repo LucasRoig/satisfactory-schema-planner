@@ -1,7 +1,7 @@
 import { SchemaUseCases } from "@/use-cases/schema";
 import { useQuery } from "@tanstack/react-query";
 
-type FetchSchemaResults = Awaited<ReturnType<typeof SchemaUseCases.fetchSchemaById>>;
+export type FetchSchemaResults = Awaited<ReturnType<typeof SchemaUseCases.fetchSchemaById>>;
 
 export const useFetchSchema = (
   schemaId: number | undefined,
