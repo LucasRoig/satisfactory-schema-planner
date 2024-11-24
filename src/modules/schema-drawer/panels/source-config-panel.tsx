@@ -2,10 +2,17 @@ import { ItemCombobox } from "@/components/item-combobox";
 import { PseudoFormDescription, PseudoFormItem, PseudoFormLabel } from "@/components/pseudo-form";
 import { Input } from "@/components/ui/input";
 import { useReactFlow } from "@xyflow/react";
+import { flushSync } from "react-dom";
 import type { SourceNode } from "../nodes/nodes-types";
 
-export function SourceConfigPanel(props: { node: SourceNode }) {
+export function SourceConfigPanel(props: { node: SourceNode; updateFlowCalc: () => void }) {
   const { updateNodeData } = useReactFlow();
+  const onDataChange = (data: Partial<Record<string, unknown>>) => {
+    flushSync(() => {
+      updateNodeData(props.node.id, data);
+    });
+    props.updateFlowCalc();
+  };
   return (
     <div className="w-full h-full max-h-full flex flex-col overflow-auto gap-4">
       <div className="text-lg">Source Node </div>
@@ -13,10 +20,7 @@ export function SourceConfigPanel(props: { node: SourceNode }) {
         <PseudoFormItem>
           <PseudoFormLabel>Item</PseudoFormLabel>
           <PseudoFormDescription>The produced by this source.</PseudoFormDescription>
-          <ItemCombobox
-            selectedItemId={props.node.data.itemId}
-            onSelect={(itemId) => updateNodeData(props.node.id, { itemId })}
-          />
+          <ItemCombobox selectedItemId={props.node.data.itemId} onSelect={(itemId) => onDataChange({ itemId })} />
         </PseudoFormItem>
         <PseudoFormItem>
           <PseudoFormLabel>Quantity</PseudoFormLabel>
@@ -24,7 +28,7 @@ export function SourceConfigPanel(props: { node: SourceNode }) {
           <Input
             type="number"
             value={props.node.data.quantity}
-            onChange={(e) => updateNodeData(props.node.id, { quantity: e.target.valueAsNumber })}
+            onChange={(e) => onDataChange({ quantity: e.target.valueAsNumber })}
           />
         </PseudoFormItem>
       </div>

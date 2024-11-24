@@ -30,6 +30,11 @@ export function useFlowState() {
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
 
+  const updateFlowCalc = useCallback(() => {
+    const flowCompute = new FlowCalc(getNodes(), getEdges(), recipes);
+    setFlowInfoMap(flowCompute.computeFlowInfo());
+  }, [getNodes, getEdges, recipes, setFlowInfoMap]);
+
   const updateNodeMutation = useMutation({
     mutationFn: (args: { schemaId: number; nodes: Node[] }) =>
       SchemaUseCases.updateSchemaNodes(args.schemaId, args.nodes),
@@ -84,10 +89,9 @@ export function useFlowState() {
       flushSync(() => {
         _addNodes(payload);
       });
-      const flowCompute = new FlowCalc(getNodes(), getEdges(), recipes);
-      setFlowInfoMap(flowCompute.computeFlowInfo());
+      updateFlowCalc();
     },
-    [_addNodes, getNodes, getEdges, setFlowInfoMap, recipes],
+    [_addNodes, updateFlowCalc],
   );
 
   const onDelete: OnDelete = useCallback(
@@ -95,10 +99,9 @@ export function useFlowState() {
       flushSync(() => {
         deleteElements(props);
       });
-      const flowCompute = new FlowCalc(getNodes(), getEdges(), recipes);
-      setFlowInfoMap(flowCompute.computeFlowInfo());
+      updateFlowCalc();
     },
-    [deleteElements, setFlowInfoMap, getEdges, getNodes, recipes],
+    [deleteElements, updateFlowCalc],
   );
 
   const onConnect: OnConnect = useCallback(
@@ -106,10 +109,9 @@ export function useFlowState() {
       flushSync(() => {
         addEdges([{ ...params, id: uuid(), animated: true, type: "edgeWithFlow" }]);
       });
-      const flowCompute = new FlowCalc(getNodes(), getEdges(), recipes);
-      setFlowInfoMap(flowCompute.computeFlowInfo());
+      updateFlowCalc();
     },
-    [addEdges, getNodes, getEdges, setFlowInfoMap, recipes],
+    [addEdges, updateFlowCalc],
   );
 
   return {
@@ -130,5 +132,6 @@ export function useFlowState() {
     addNodes,
     onDelete,
     onConnect,
+    updateFlowCalc,
   };
 }

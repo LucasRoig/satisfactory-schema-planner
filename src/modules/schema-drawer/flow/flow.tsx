@@ -54,8 +54,18 @@ function _Flow() {
   const { focusedSchemaId } = useSchemaDrawerContext();
   const { getNodes, getEdges } = useReactFlow();
 
-  const { nodes, edges, flowInfoMap, setSchema, onNodesChange, onEdgesChange, addNodes, onConnect, onDelete } =
-    useFlowState();
+  const {
+    nodes,
+    edges,
+    flowInfoMap,
+    setSchema,
+    onNodesChange,
+    onEdgesChange,
+    addNodes,
+    onConnect,
+    onDelete,
+    updateFlowCalc,
+  } = useFlowState();
 
   const isValidConnection: IsValidConnection = useCallback(
     (connection) => {
@@ -108,7 +118,7 @@ function _Flow() {
               nodeTypes={nodeTypes}
               edgeTypes={edgeTypes}
             >
-              <ConfigPanel nodes={nodes} edges={edges} flowInfoMap={flowInfoMap} />
+              <ConfigPanel nodes={nodes} edges={edges} flowInfoMap={flowInfoMap} updateFlowCalc={updateFlowCalc} />
               <Background />
             </ReactFlow>
           </>
