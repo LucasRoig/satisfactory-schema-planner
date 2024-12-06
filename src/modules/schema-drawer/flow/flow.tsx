@@ -8,6 +8,7 @@ import {
   getOutgoers,
   useReactFlow,
 } from "@xyflow/react";
+
 import { type MouseEventHandler, type ReactElement, createContext, useCallback, useRef, useState } from "react";
 import "@xyflow/react/dist/style.css";
 import { EdgeWithFlow } from "../edges/edge-with-flow";
@@ -22,6 +23,7 @@ import { useFetchSchema } from "../queries/use-fetch-schema";
 import { useSchemaDrawerContext } from "../schema-drawer-context";
 import { NodeCommandPicker } from "./node-command-picker";
 import { useFlowState } from "./use-flow-state";
+import { useNodeCopyPasteContext } from "./node-copy-paste-context";
 
 // const initialNodes = [
 //   { id: "1", position: { x: 0, y: 0 }, data: { label: "1" } },
@@ -52,7 +54,9 @@ export function Flow() {
 
 function _Flow() {
   const { focusedSchemaId } = useSchemaDrawerContext();
-  const { getNodes, getEdges } = useReactFlow();
+  const { getNodes, getEdges, screenToFlowPosition } = useReactFlow();
+  const { copyNodes, pasteNodes } = useNodeCopyPasteContext();
+  const lastMousePosition = useRef<XYPosition>();
 
   const {
     nodes,
@@ -65,6 +69,8 @@ function _Flow() {
     onConnect,
     onDelete,
     updateFlowCalc,
+    setSelectedNodes,
+    addEdges,
   } = useFlowState();
 
   const isValidConnection: IsValidConnection = useCallback(
@@ -99,37 +105,75 @@ function _Flow() {
     onSuccess: setSchema,
   });
 
+  const handleKeyDown: React.KeyboardEventHandler<HTMLDivElement> = useCallback(
+    (e) => {
+      if (e.ctrlKey && e.key === "c") {
+        const selectedNodes = getNodes().filter((n) => n.selected);
+        copyNodes(selectedNodes, getEdges());
+      } else if (e.ctrlKey && e.key === "v") {
+        const result = pasteNodes(lastMousePosition.current ?? { x: 0, y: 0 });
+        addNodes(result.newNodes);
+        addEdges(result.newEdges);
+        setSelectedNodes(result.newNodes);
+      } else if (e.ctrlKey && e.key === "d") {
+        e.preventDefault();
+        const selectedNodes = getNodes().filter((n) => n.selected);
+        if (selectedNodes.length === 0) {
+          return;
+        }
+        copyNodes(selectedNodes, getEdges());
+        const result = pasteNodes({x: selectedNodes[0].position.x + 30, y: selectedNodes[0].position.y + 30});
+        addNodes(result.newNodes);
+        addEdges(result.newEdges);
+        setSelectedNodes(result.newNodes);
+      }
+    },
+    [getNodes, pasteNodes, copyNodes, addNodes, setSelectedNodes, getEdges, addEdges],
+  );
+
+  const handleMouseMove: MouseEventHandler<HTMLDivElement> = useCallback(
+    (e) => {
+      const { x, y } = screenToFlowPosition({ x: e.clientX, y: e.clientY });
+      lastMousePosition.current = { x, y };
+    },
+    [screenToFlowPosition],
+  );
+
   return (
-    <DoubleClickHandlerContextProvider addNodes={addNodes}>
-      <doubleClickHandlerContext.Consumer>
-        {(ctx) => (
-          <>
-            <ReactFlow
-              deleteKeyCode="Delete"
-              isValidConnection={isValidConnection}
-              zoomOnDoubleClick={false}
-              onDoubleClick={ctx?.handleDoubleClick}
-              nodes={nodes}
-              edges={edges}
-              onNodesChange={onNodesChange}
-              onEdgesChange={onEdgesChange}
-              onConnect={onConnect}
-              onDelete={onDelete}
-              nodeTypes={nodeTypes}
-              edgeTypes={edgeTypes}
-              id="reactflow"
-              selectionOnDrag={true}
-              panOnScroll={true}
-              zoomOnPinch={true}
-              panOnDrag={false}
-            >
-              <ConfigPanel nodes={nodes} edges={edges} flowInfoMap={flowInfoMap} updateFlowCalc={updateFlowCalc} />
-              <Background />
-            </ReactFlow>
-          </>
-        )}
-      </doubleClickHandlerContext.Consumer>
-    </DoubleClickHandlerContextProvider>
+    // biome-ignore lint/a11y/noNoninteractiveTabindex: <explanation>
+    <div className="w-full h-full" onKeyDown={handleKeyDown} tabIndex={0}>
+      <DoubleClickHandlerContextProvider addNodes={addNodes}>
+        <doubleClickHandlerContext.Consumer>
+          {(ctx) => (
+            <>
+              <ReactFlow
+                onMouseMove={handleMouseMove}
+                deleteKeyCode="Delete"
+                isValidConnection={isValidConnection}
+                zoomOnDoubleClick={false}
+                onDoubleClick={ctx?.handleDoubleClick}
+                nodes={nodes}
+                edges={edges}
+                onNodesChange={onNodesChange}
+                onEdgesChange={onEdgesChange}
+                onConnect={onConnect}
+                onDelete={onDelete}
+                nodeTypes={nodeTypes}
+                edgeTypes={edgeTypes}
+                id="reactflow"
+                selectionOnDrag={true}
+                panOnScroll={true}
+                zoomOnPinch={true}
+                panOnDrag={false}
+              >
+                <ConfigPanel nodes={nodes} edges={edges} flowInfoMap={flowInfoMap} updateFlowCalc={updateFlowCalc} />
+                <Background />
+              </ReactFlow>
+            </>
+          )}
+        </doubleClickHandlerContext.Consumer>
+      </DoubleClickHandlerContextProvider>
+    </div>
   );
 }
 

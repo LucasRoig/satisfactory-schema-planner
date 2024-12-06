@@ -12,6 +12,7 @@ import {
   applyEdgeChanges,
   applyNodeChanges,
   useReactFlow,
+  useStore,
 } from "@xyflow/react";
 import { useCallback, useState } from "react";
 import { flushSync } from "react-dom";
@@ -22,13 +23,28 @@ import type { FetchSchemaResults } from "../queries/use-fetch-schema";
 import { useSchemaDrawerContext } from "../schema-drawer-context";
 
 export function useFlowState() {
+  const addSelectedNodes = useStore(store => store.addSelectedNodes);
+  const unselectNodesAndEdges = useStore(store => store.unselectNodesAndEdges);
+
   const { focusedSchemaId } = useSchemaDrawerContext();
   const { recipes } = useProfileContext();
   const { flowInfoMap, setFlowInfoMap } = useFlowCalcContext();
-  const { getNodes, getEdges, addNodes: _addNodes, deleteElements, addEdges } = useReactFlow();
+  const { getNodes, getEdges, addNodes: _addNodes, deleteElements, addEdges: _addEdges } = useReactFlow();
 
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
+
+  const setSelectedNodes = useCallback((localNodes: Node[]) => {
+    const selectedNodes = nodes.filter(n => n.selected);
+    const selectedEdges = edges.filter(e => e.selected);
+    flushSync(() => {
+      unselectNodesAndEdges({
+        nodes: selectedNodes,
+        edges: selectedEdges,
+      });
+    });
+    addSelectedNodes(localNodes.map(n => n.id));
+  }, [addSelectedNodes, unselectNodesAndEdges, edges, nodes]);
 
   const updateFlowCalc = useCallback(() => {
     const flowCompute = new FlowCalc(getNodes(), getEdges(), recipes);
@@ -94,6 +110,16 @@ export function useFlowState() {
     [_addNodes, updateFlowCalc],
   );
 
+  const addEdges = useCallback(
+    (payload: Edge | Edge[]) => {
+      flushSync(() => {
+        _addEdges(payload);
+      });
+      updateFlowCalc();
+    },
+    [_addEdges, updateFlowCalc],
+  );
+
   const onDelete: OnDelete = useCallback(
     (props) => {
       flushSync(() => {
@@ -106,12 +132,9 @@ export function useFlowState() {
 
   const onConnect: OnConnect = useCallback(
     (params) => {
-      flushSync(() => {
         addEdges([{ ...params, id: uuid(), animated: true, type: "edgeWithFlow" }]);
-      });
-      updateFlowCalc();
     },
-    [addEdges, updateFlowCalc],
+    [addEdges],
   );
 
   return {
@@ -133,5 +156,7 @@ export function useFlowState() {
     onDelete,
     onConnect,
     updateFlowCalc,
+    setSelectedNodes,
+    addEdges,
   };
 }

@@ -11,6 +11,7 @@ import { SchemaDrawer } from "./modules/schema-drawer/schema-drawer";
 import { SchemaDrawerContextProvider } from "./modules/schema-drawer/schema-drawer-context";
 import { SettingsContextProvider } from "./modules/settings/settings-context";
 import { queryClient } from "./query-client";
+import { NodeCopyPasteContextProvider } from "./modules/schema-drawer/flow/node-copy-paste-context";
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -27,9 +28,11 @@ function App() {
               </div>
             </div>
             <main className="grow">
-              <SchemaDrawerContextProvider>
-                <SchemaDrawer />
-              </SchemaDrawerContextProvider>
+              <NodeCopyPasteContextProvider>
+                <SchemaDrawerContextProvider>
+                  <SchemaDrawer />
+                </SchemaDrawerContextProvider>
+              </NodeCopyPasteContextProvider>
             </main>
           </div>
         </SettingsContextProvider>
